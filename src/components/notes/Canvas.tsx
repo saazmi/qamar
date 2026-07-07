@@ -167,6 +167,7 @@ export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas(
                 fill="none"
                 strokeLinecap="round"
                 strokeLinejoin="round"
+                vectorEffect="non-scaling-stroke"
               />
             ))}
             {preview && preview.p.length > 0 && (
@@ -178,6 +179,7 @@ export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas(
                 fill="none"
                 strokeLinecap="round"
                 strokeLinejoin="round"
+                vectorEffect="non-scaling-stroke"
               />
             )}
           </Svg>
@@ -215,6 +217,7 @@ export function CanvasView({
           fill="none"
           strokeLinecap="round"
           strokeLinejoin="round"
+          vectorEffect="non-scaling-stroke"
         />
       ))}
     </Svg>
