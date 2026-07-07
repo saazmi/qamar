@@ -165,6 +165,14 @@ export function VerseSheet() {
               </Pressable>
             )}
 
+            <Pressable
+              style={styles.audioBtn}
+              onPress={() => showToast({ message: 'Audio — bientôt disponible' })}
+            >
+              <Text style={styles.audioGlyph}>▶</Text>
+              <Text style={styles.audioLabel}>Écouter</Text>
+            </Pressable>
+
             {frenchText ? (
               <View style={styles.translationCard}>
                 <Text style={styles.translationLabel}>Traduction · Hamidullah</Text>
@@ -289,6 +297,26 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter_600SemiBold',
     fontSize: 14,
     color: light.accent,
+  },
+  audioBtn: {
+    marginTop: 12,
+    paddingVertical: 12,
+    borderRadius: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: '#F5EFE4',
+  },
+  audioGlyph: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 14,
+    color: light.accent,
+  },
+  audioLabel: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 14,
+    color: light.text,
   },
   translationCard: {
     marginTop: 20,
