@@ -2,7 +2,7 @@
 // Color-coded per bucket; tap opens the reading view for that surah.
 
 import { Link } from 'expo-router';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 import type { AgingBucket, AgingSurah } from '../../hooks/useAgingSurahs';
 import { light } from '@theme/colors';
 
@@ -32,15 +32,17 @@ export function AgingSurahList({ items }: Props) {
     <View style={styles.column}>
       {items.map((s) => {
         const c = BUCKET_COLORS[s.bucket];
+        const rowStyle: StyleProp<ViewStyle> = StyleSheet.flatten([
+          styles.row,
+          { backgroundColor: c.bg, borderColor: c.border },
+        ]);
         return (
           <Link
             key={s.surah}
             href={{ pathname: '/surahs/[surahId]', params: { surahId: String(s.surah) } }}
             asChild
           >
-            <Pressable
-              style={[styles.row, { backgroundColor: c.bg, borderColor: c.border }]}
-            >
+            <Pressable style={rowStyle}>
               <View style={styles.rowMain}>
                 <Text style={[styles.name, { color: c.text }]}>{s.name}</Text>
                 <Text style={[styles.sub, { color: c.text }]}>
