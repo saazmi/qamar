@@ -1,11 +1,171 @@
 // Surah list. SPEC §10.3. FlashList of 114 rows, tri-color progress bars.
 
-import { View, Text } from 'react-native';
+import { Link, useRouter } from 'expo-router';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
+import { SurahProgressBar } from '@components/tracking/SurahProgressBar';
+import structure from '@content/structure.json';
+import type { SurahMeta } from '@content/types';
+import { useSurahProgress } from '../../hooks/useSurahProgress';
+import { light } from '@theme/colors';
+
+const META = structure as SurahMeta[];
 
 export default function SurahListScreen() {
+  const router = useRouter();
+  const { perSurah, overall } = useSurahProgress();
+
   return (
-    <View>
-      <Text>Surah list (Phase 3 stub)</Text>
+    <View style={styles.host}>
+      <View style={styles.header}>
+        <Pressable onPress={() => router.back()} hitSlop={12}>
+          <Text style={styles.back}>‹</Text>
+        </Pressable>
+        <View style={styles.titles}>
+          <Text style={styles.title}>Sourates</Text>
+          <Text style={styles.subtitle}>
+            {overall.memorized.toLocaleString('fr-FR')} / {overall.total.toLocaleString('fr-FR')} mémorisés
+          </Text>
+        </View>
+        <View style={{ width: 24 }} />
+      </View>
+
+      <FlashList
+        data={META}
+        keyExtractor={(s) => String(s.id)}
+        contentContainerStyle={{ paddingHorizontal: 12, paddingBottom: 32 }}
+        renderItem={({ item }) => {
+          const counts = perSurah.get(item.id) ?? {
+            memorized: 0,
+            learning: 0,
+            needsReview: 0,
+            total: item.ayahCount,
+          };
+          return (
+            <Link
+              href={{ pathname: '/surahs/[surahId]', params: { surahId: String(item.id) } }}
+              asChild
+            >
+              <Pressable style={styles.row}>
+                <View style={styles.numberCircle}>
+                  <Text style={styles.number}>{item.id}</Text>
+                </View>
+                <View style={styles.rowMain}>
+                  <View style={styles.rowTopLine}>
+                    <Text style={styles.french}>{item.nameFrench}</Text>
+                    <Text style={styles.count}>{item.ayahCount}</Text>
+                  </View>
+                  <View style={styles.rowMidLine}>
+                    <Text style={styles.arabic}>{item.nameArabic}</Text>
+                    <Text style={styles.place}>{item.revelationPlace === 'makkah' ? 'Mecquoise' : 'Médinoise'}</Text>
+                  </View>
+                  <SurahProgressBar
+                    memorized={counts.memorized}
+                    learning={counts.learning}
+                    needsReview={counts.needsReview}
+                    total={counts.total}
+                  />
+                </View>
+              </Pressable>
+            </Link>
+          );
+        }}
+      />
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  host: {
+    flex: 1,
+    backgroundColor: light.bg,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingTop: 48,
+    paddingBottom: 12,
+    gap: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#EEE7DD',
+  },
+  back: {
+    fontSize: 28,
+    fontFamily: 'Inter_600SemiBold',
+    color: light.text,
+    width: 24,
+  },
+  titles: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  title: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 18,
+    color: light.text,
+  },
+  subtitle: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 12,
+    color: light.textMuted,
+    marginTop: 2,
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 4,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F0EADF',
+  },
+  numberCircle: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#F0EADF',
+  },
+  number: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 13,
+    color: light.textMuted,
+  },
+  rowMain: {
+    flex: 1,
+    gap: 6,
+  },
+  rowTopLine: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  rowMidLine: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  french: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 15,
+    color: light.text,
+  },
+  count: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 12,
+    color: light.textMuted,
+  },
+  arabic: {
+    fontFamily: 'NotoNaskhArabic_400Regular',
+    fontSize: 18,
+    color: light.text,
+  },
+  place: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 11,
+    color: light.textMuted,
+    textTransform: 'lowercase',
+  },
+});
