@@ -38,7 +38,7 @@ export const useSessionStore = create<SessionState>((set) => ({
   openVerseSheet: (surah, ayah) => set({ openVerse: { surah, ayah } }),
   closeVerseSheet: () => set({ openVerse: null }),
 
-  readingMode: 'mark',
+  readingMode: 'read',
   setReadingMode: (m) => set({ readingMode: m, rangeAnchor: null }),
 
   rangeAnchor: null,
