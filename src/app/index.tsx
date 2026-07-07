@@ -5,8 +5,9 @@
 
 import { Link, useRouter } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { Settings, Sparkles } from 'lucide-react-native';
+import { Settings } from 'lucide-react-native';
 import { AgingSurahList } from '@components/tracking/AgingSurahList';
+import { PlanCard } from '@components/tracking/PlanCard';
 import { useAgingSurahs } from '../hooks/useAgingSurahs';
 import { useSurahProgress } from '../hooks/useSurahProgress';
 import { useSettingsStore } from '@stores/settings';
@@ -50,18 +51,7 @@ export default function TodayScreen() {
       {features.assistedPlanning && (
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>Planification</Text>
-          <View style={styles.card}>
-            <View style={styles.cardHead}>
-              <Sparkles size={16} color={light.accentSecondary} />
-              <Text style={styles.cardLabel}>À configurer</Text>
-            </View>
-            <Text style={styles.cardTitle}>Répondez à quelques questions</Text>
-            <Text style={styles.cardBody}>
-              Nous générerons un plan personnalisé avec une cadence adaptée et une
-              estimation de temps qui se met à jour selon votre rythme.
-            </Text>
-            <Text style={styles.cardCta}>Bientôt disponible</Text>
-          </View>
+          <PlanCard />
         </View>
       )}
 
