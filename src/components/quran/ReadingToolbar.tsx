@@ -12,11 +12,11 @@ interface ModeDef {
 }
 
 const MODES: readonly ModeDef[] = [
-  { key: 'details', label: 'Détails', glyph: 'ⓘ' },
   { key: 'mark', label: 'Marquer', glyph: '●' },
   { key: 'range', label: 'Sélection', glyph: '⇥' },
   { key: 'notes', label: 'Notes', glyph: '✎' },
   { key: 'listen', label: 'Écouter', glyph: '▶' },
+  { key: 'details', label: 'Détails', glyph: 'ⓘ' },
 ];
 
 export function ReadingToolbar() {

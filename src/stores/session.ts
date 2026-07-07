@@ -12,6 +12,12 @@ interface OpenVerse {
   ayah: number;
 }
 
+interface RangeSelection {
+  surah: number;
+  from: number;
+  to: number;
+}
+
 interface SessionState {
   openVerse: OpenVerse | null;
   openVerseSheet: (surah: number, ayah: number) => void;
@@ -22,6 +28,9 @@ interface SessionState {
 
   rangeAnchor: { surah: number; ayah: number } | null;
   setRangeAnchor: (v: { surah: number; ayah: number } | null) => void;
+
+  rangeSelection: RangeSelection | null;
+  setRangeSelection: (v: RangeSelection | null) => void;
 }
 
 export const useSessionStore = create<SessionState>((set) => ({
@@ -29,9 +38,12 @@ export const useSessionStore = create<SessionState>((set) => ({
   openVerseSheet: (surah, ayah) => set({ openVerse: { surah, ayah } }),
   closeVerseSheet: () => set({ openVerse: null }),
 
-  readingMode: 'read',
+  readingMode: 'mark',
   setReadingMode: (m) => set({ readingMode: m, rangeAnchor: null }),
 
   rangeAnchor: null,
   setRangeAnchor: (v) => set({ rangeAnchor: v }),
+
+  rangeSelection: null,
+  setRangeSelection: (v) => set({ rangeSelection: v }),
 }));

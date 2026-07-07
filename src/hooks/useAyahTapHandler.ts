@@ -15,10 +15,10 @@ export function useAyahTapHandler() {
   const mode = useSessionStore((s) => s.readingMode);
   const rangeAnchor = useSessionStore((s) => s.rangeAnchor);
   const setRangeAnchor = useSessionStore((s) => s.setRangeAnchor);
+  const setRangeSelection = useSessionStore((s) => s.setRangeSelection);
   const openVerseSheet = useSessionStore((s) => s.openVerseSheet);
 
   const setState = useHifzStore((s) => s.setState);
-  const applyRange = useHifzStore((s) => s.applyRange);
   const undo = useHifzStore((s) => s.undo);
   const records = useHifzStore((s) => s.records);
   const showToast = useUiStore((s) => s.showToast);
@@ -47,13 +47,8 @@ export function useAyahTapHandler() {
         }
         const from = Math.min(rangeAnchor.ayah, ayah);
         const to = Math.max(rangeAnchor.ayah, ayah);
-        applyRange(surah, from, to, 'memorized');
         setRangeAnchor(null);
-        showToast({
-          message: `Mémorisé · ${surah}:${from}–${to}`,
-          actionLabel: 'Annuler',
-          onAction: () => undo(),
-        });
+        setRangeSelection({ surah, from, to });
         return;
       }
 
@@ -79,8 +74,8 @@ export function useAyahTapHandler() {
       rangeAnchor,
       records,
       setRangeAnchor,
+      setRangeSelection,
       setState,
-      applyRange,
       undo,
       showToast,
       openVerseSheet,
