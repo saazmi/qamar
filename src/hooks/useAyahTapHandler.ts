@@ -43,11 +43,7 @@ export function useAyahTapHandler() {
         void (async () => {
           await stopPlayback();
           await ensureAudioConfigured();
-          // Tap-to-jump inside an ongoing playback should NOT re-play the
-          // basmalah — that intro belongs to the fresh header-Play only.
-          await playRange(surah, ayah, ayahCount, setPlayingAyah, {
-            includeBasmalah: false,
-          });
+          await playRange(surah, ayah, ayahCount, setPlayingAyah);
         })();
         return;
       }
@@ -87,10 +83,9 @@ export function useAyahTapHandler() {
       if (mode === 'listen') {
         void (async () => {
           await ensureAudioConfigured();
-          setPlayingAyah({ surah, ayah });
-          await playAyah(surah, ayah, {
-            onFinished: () => setPlayingAyah(null),
-          });
+          // Single-ayah play through playRange so the basmalah prefix
+          // rule applies (fromAyah === 1 & non-Fatiha/Tawba).
+          await playRange(surah, ayah, ayah, setPlayingAyah);
         })();
         return;
       }

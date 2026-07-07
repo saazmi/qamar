@@ -3,7 +3,7 @@
 // fragmented, verse sheet) show the same highlight.
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ensureAudioConfigured, playAyah, stopPlayback } from '@audio/player';
+import { ensureAudioConfigured, playRange, stopPlayback } from '@audio/player';
 import { useSessionStore } from '@stores/session';
 
 export function useAyahAudio() {
@@ -23,11 +23,10 @@ export function useAyahAudio() {
     async (surah: number, ayah: number) => {
       setLoading(true);
       try {
-        setPlayingAyah({ surah, ayah });
-        await playAyah(surah, ayah, {
-          onFinished: () => {
-            if (mounted.current) setPlayingAyah(null);
-          },
+        // Route through playRange so the basmalah prefix applies uniformly
+        // to any ayah-1 play (Écouter mode, Détails sheet, header Play).
+        await playRange(surah, ayah, ayah, (v) => {
+          if (mounted.current) setPlayingAyah(v);
         });
       } finally {
         if (mounted.current) setLoading(false);
