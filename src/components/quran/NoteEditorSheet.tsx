@@ -115,7 +115,7 @@ export function NoteEditorSheet() {
     const preview =
       note.kind === 'text'
         ? note.body.slice(0, 40) + (note.body.length > 40 ? '…' : '')
-        : 'dessin';
+        : 'manuscrit';
     showToast({
       message: `Note supprimée · ${preview}`,
       actionLabel: 'Annuler',
@@ -182,7 +182,7 @@ export function NoteEditorSheet() {
                   <View key={n.id} style={styles.noteCard}>
                     <View style={styles.noteHeader}>
                       <Text style={styles.noteKindPill}>
-                        {n.kind === 'canvas' ? '✎ Dessin' : 'T Texte'}
+                        {n.kind === 'canvas' ? '✎ Manuscrit' : 'T Texte'}
                       </Text>
                     </View>
                     {editingId === n.id ? (
@@ -290,7 +290,7 @@ export function NoteEditorSheet() {
                     ✎
                   </Text>
                   <Text style={[styles.kindSub, draftKind === 'canvas' && styles.kindSubActive]}>
-                    Dessin
+                    Manuscrit
                   </Text>
                 </Pressable>
               </View>

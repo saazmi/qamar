@@ -220,7 +220,7 @@ export function VerseSheet() {
                       <View key={n.id} style={styles.noteCard}>
                         <View style={styles.noteHeaderRow}>
                           <Text style={styles.noteScope}>
-                            {scopeLabel} · {n.kind === 'canvas' ? 'dessin' : 'texte'}
+                            {scopeLabel} · {n.kind === 'canvas' ? 'manuscrit' : 'texte'}
                           </Text>
                           <Pressable
                             onPress={() => setViewingId(expanded ? null : n.id)}
