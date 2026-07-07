@@ -66,6 +66,20 @@ export async function stopPlayback(): Promise<void> {
 
 let sequenceGen = 0;
 
+// Traditional recitation prefixes every surah except Al-Fatiha (surah 1,
+// whose ayah 1 IS the basmalah) and At-Tawba (surah 9, no basmalah) with
+// "Bismillah…". We reuse Al-Fatiha's ayah-1 recording as that prefix, glued
+// to the first ayah's highlight so the user sees ayah 1 lit up while the
+// basmalah plays.
+const BASMALAH_SURAH = 1;
+const BASMALAH_AYAH = 1;
+function needsBasmalahPrefix(surah: number, fromAyah: number): boolean {
+  if (fromAyah !== 1) return false;
+  if (surah === 1) return false; // Al-Fatiha
+  if (surah === 9) return false; // At-Tawba
+  return true;
+}
+
 // Play a run of ayat back-to-back. Advances via onFinished callback of each
 // track. Returns immediately with a stop() handle; the caller receives per-
 // ayah progress via onAyahChange.
@@ -93,14 +107,23 @@ export async function playRange(
     });
   };
 
-  await playNext(fromAyah);
+  if (needsBasmalahPrefix(surah, fromAyah)) {
+    // Highlight ayah 1 of the target surah while the basmalah plays.
+    onAyahChange({ surah, ayah: 1 });
+    await playAyah(BASMALAH_SURAH, BASMALAH_AYAH, {
+      rate: opts.rate,
+      onFinished: () => {
+        void playNext(fromAyah);
+      },
+    });
+  } else {
+    await playNext(fromAyah);
+  }
 
   return {
     stop: async () => {
       if (gen === sequenceGen) {
         sequenceGen += 1;
-        // Deliberately do NOT call onAyahChange(null) here — callers rely on
-        // the last-played ayah remaining set to support pause/resume.
         await unloadCurrent();
       }
     },
