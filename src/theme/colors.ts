@@ -3,14 +3,18 @@
 export const light = {
   bg: '#F5EAC7', // light parchment gold — mushaf feel (from the secondary accent family)
   surface: '#FFFDF6', // near-white with a warm cast so cards still pop against the gold bg
+  surfaceMuted: '#EFDDA8', // subtly darker parchment for card interiors
+  border: '#D9C48A', // soft gold border — visible on both bg and surface
+  borderMuted: '#E7D6A4', // gentler divider for row separators
+  grabber: '#C9B57A', // sheet grabber pill
 
   text: '#1F1B16',
-  textMuted: '#6B6357',
+  textMuted: '#6D5F3E', // warm gold-brown so muted text harmonizes with the bg
   accent: '#2D6A4F', // memorized / primary
-  accentSecondary: '#C9A227', // gold, milestones/juz rings
+  accentSecondary: '#B7891A', // deeper gold — meets AA contrast against parchment
   state: {
-    learningBg: '#F7E5C1',
-    memorizedBg: '#DCEBE1',
+    learningBg: '#F3D488', // shifted amber — visible against parchment
+    memorizedBg: '#CDE4D3', // cooler mint so green vs gold reads clearly
     memorizedLine: '#2D6A4F',
     needsReview: '#8FB39D',
     playingBg: '#D6DEEF',
@@ -24,6 +28,10 @@ export const light = {
 export const dark = {
   bg: '#1A1714',
   surface: '#241F1B',
+  surfaceMuted: '#2C2621',
+  border: '#3A322A',
+  borderMuted: '#2E2822',
+  grabber: '#4A4136',
   text: '#F4EEE4',
   textMuted: '#9F978A',
   accent: '#5FA383',

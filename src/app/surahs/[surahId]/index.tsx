@@ -219,7 +219,7 @@ const styles = StyleSheet.create({
     paddingBottom: 12,
     gap: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#EEE7DD',
+    borderBottomColor: light.border,
   },
   headerTitles: {
     flex: 1,

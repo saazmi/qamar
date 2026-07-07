@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#EEE7DD',
+    borderColor: light.border,
     overflow: 'hidden',
   },
   controlsRow: {

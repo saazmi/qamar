@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
     paddingBottom: 12,
     gap: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#EEE7DD',
+    borderBottomColor: light.border,
   },
   back: {
     fontSize: 28,
@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 4,
     borderBottomWidth: 1,
-    borderBottomColor: '#F0EADF',
+    borderBottomColor: light.borderMuted,
   },
   numberCircle: {
     width: 32,
@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#F0EADF',
+    backgroundColor: light.surfaceMuted,
   },
   number: {
     fontFamily: 'Inter_600SemiBold',

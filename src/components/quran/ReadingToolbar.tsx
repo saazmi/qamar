@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     gap: 6,
     borderBottomWidth: 1,
-    borderBottomColor: '#EEE7DD',
+    borderBottomColor: light.border,
     backgroundColor: light.bg,
   },
   btn: {
@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     backgroundColor: light.state.memorizedBg,
     borderBottomWidth: 1,
-    borderBottomColor: '#DCEBE1',
+    borderBottomColor: light.state.memorizedBg,
   },
   instruction: {
     fontFamily: 'Inter_400Regular',

@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 20,
     borderWidth: 1,
-    borderColor: '#EEE7DD',
+    borderColor: light.border,
     gap: 4,
   },
   statLabel: {
@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 20,
     borderWidth: 1,
-    borderColor: '#DCEBE1',
+    borderColor: light.state.memorizedBg,
     gap: 4,
   },
   reviewLabel: {

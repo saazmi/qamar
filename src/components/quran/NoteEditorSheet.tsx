@@ -339,7 +339,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 4,
     borderRadius: 2,
-    backgroundColor: '#DED7CB',
+    backgroundColor: light.grabber,
     alignSelf: 'center',
     marginBottom: 12,
   },
@@ -389,7 +389,7 @@ const styles = StyleSheet.create({
   noteCard: {
     padding: 12,
     borderRadius: 8,
-    backgroundColor: '#F5EFE4',
+    backgroundColor: light.surfaceMuted,
     borderLeftWidth: 3,
     borderLeftColor: light.accentSecondary,
     marginBottom: 8,
@@ -430,7 +430,7 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: '#EEE7DD',
+    borderColor: light.border,
     borderRadius: 8,
     padding: 12,
     minHeight: 80,
@@ -451,7 +451,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: 'center',
-    backgroundColor: '#F5EFE4',
+    backgroundColor: light.surfaceMuted,
   },
   kindBtnActive: {
     backgroundColor: light.accent,

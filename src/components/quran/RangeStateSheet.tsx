@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 4,
     borderRadius: 2,
-    backgroundColor: '#DED7CB',
+    backgroundColor: light.grabber,
     alignSelf: 'center',
     marginBottom: 16,
   },
@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
   stateBtn: {
     paddingVertical: 16,
     borderRadius: 10,
-    backgroundColor: '#F5EFE4',
+    backgroundColor: light.surfaceMuted,
     alignItems: 'center',
   },
   stateLabel: {

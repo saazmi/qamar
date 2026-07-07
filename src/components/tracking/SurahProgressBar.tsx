@@ -49,7 +49,7 @@ export function SurahProgressBar({
 
 const styles = StyleSheet.create({
   track: {
-    backgroundColor: '#EEE7DD',
+    backgroundColor: light.border,
     borderRadius: 3,
     overflow: 'hidden',
     position: 'relative',

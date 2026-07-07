@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 4,
     borderRadius: 2,
-    backgroundColor: '#DED7CB',
+    backgroundColor: light.grabber,
     alignSelf: 'center',
     marginBottom: 12,
   },
@@ -322,7 +322,7 @@ const styles = StyleSheet.create({
   stateRow: {
     flexDirection: 'row',
     borderRadius: 10,
-    backgroundColor: '#F5EFE4',
+    backgroundColor: light.surfaceMuted,
     padding: 4,
     gap: 4,
   },
@@ -369,7 +369,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: '#F5EFE4',
+    backgroundColor: light.surfaceMuted,
   },
   audioGlyph: {
     fontFamily: 'Inter_600SemiBold',
@@ -385,7 +385,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     padding: 16,
     borderRadius: 10,
-    backgroundColor: '#F5EFE4',
+    backgroundColor: light.surfaceMuted,
   },
   translationLabel: {
     fontFamily: 'Inter_600SemiBold',
@@ -422,7 +422,7 @@ const styles = StyleSheet.create({
   noteCard: {
     padding: 12,
     borderRadius: 8,
-    backgroundColor: '#F5EFE4',
+    backgroundColor: light.surfaceMuted,
     borderLeftWidth: 3,
     borderLeftColor: light.accentSecondary,
   },
