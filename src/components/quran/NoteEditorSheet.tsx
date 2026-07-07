@@ -23,7 +23,9 @@ import { useUiStore } from '@stores/ui';
 import { light } from '@theme/colors';
 
 const META = structure as SurahMeta[];
-const MAX_BODY = 5000;
+const MAX_TEXT_BODY = 5000; // Text notes only. Canvas notes are unbounded here
+                            // (storage-headroom warning surfaced via toast).
+const STORAGE_WARN_BYTES = 4 * 1024 * 1024; // ~4 MB — approaching Android AsyncStorage cap.
 
 export function NoteEditorSheet() {
   const target = useSessionStore((s) => s.noteEditor);
@@ -32,6 +34,7 @@ export function NoteEditorSheet() {
   const addNote = useNotesStore((s) => s.addNote);
   const updateNote = useNotesStore((s) => s.updateNote);
   const removeNote = useNotesStore((s) => s.removeNote);
+  const totalBodyBytes = useNotesStore((s) => s.totalBodyBytes);
   const showToast = useUiStore((s) => s.showToast);
 
   const [draftKind, setDraftKind] = useState<NoteKind>('text');
@@ -58,17 +61,28 @@ export function NoteEditorSheet() {
 
   if (!target || !meta) return null;
 
+  const warnIfNearCap = (extraBytes: number) => {
+    const projected = totalBodyBytes() + extraBytes;
+    if (projected > STORAGE_WARN_BYTES) {
+      showToast({
+        message: `Stockage: ${(projected / 1024 / 1024).toFixed(1)} MB — pense à supprimer d'anciennes notes.`,
+      });
+    }
+  };
+
   const handleAdd = () => {
     if (draftKind === 'text') {
       const body = draftText.trim();
       if (!body) return;
       addNote({ scope: 'ayah', kind: 'text', surah: target.surah, ayah: target.ayah, body });
+      warnIfNearCap(body.length);
       setDraftText('');
     } else {
       const c = canvasRef.current;
       if (!c || c.isEmpty()) return;
       const body = c.serialize();
       addNote({ scope: 'ayah', kind: 'canvas', surah: target.surah, ayah: target.ayah, body });
+      warnIfNearCap(body.length);
       c.clear();
     }
   };
@@ -161,7 +175,7 @@ export function NoteEditorSheet() {
                             value={editingBody}
                             onChangeText={setEditingBody}
                             multiline
-                            maxLength={MAX_BODY}
+                            maxLength={MAX_TEXT_BODY}
                             style={styles.input}
                             placeholder="Modifier la note…"
                             placeholderTextColor={light.textMuted}
@@ -242,7 +256,7 @@ export function NoteEditorSheet() {
                   value={draftText}
                   onChangeText={setDraftText}
                   multiline
-                  maxLength={MAX_BODY}
+                  maxLength={MAX_TEXT_BODY}
                   placeholder="Écrivez une note…"
                   placeholderTextColor={light.textMuted}
                   style={styles.input}

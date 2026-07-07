@@ -35,6 +35,7 @@ interface NotesState {
   removeNote: (id: string) => void;
   notesForVerse: (surah: number, ayah: number) => Note[];
   notesForSurah: (surah: number) => Note[];
+  totalBodyBytes: () => number;
 }
 
 const nowIso = (): string => new Date().toISOString();
@@ -82,6 +83,8 @@ export const useNotesStore = create<NotesState>()(
 
       notesForSurah: (surah) =>
         get().notes.filter((n) => n.scope === 'surah' && n.surah === surah),
+
+      totalBodyBytes: () => get().notes.reduce((sum, n) => sum + n.body.length, 0),
     }),
     {
       name: 'qamar.notes.v1',
