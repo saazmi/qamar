@@ -205,16 +205,20 @@ export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas(
 
 interface CanvasViewProps {
   body: string;
+  // Fixed pixel width; if omitted, view fills container via onLayout.
   width?: number;
   // aspectRatio prop no longer accepted — the note's saved aspect wins.
 }
 
-export function CanvasView({ body, width = 240 }: CanvasViewProps) {
+export function CanvasView({ body, width }: CanvasViewProps) {
   const { ar, strokes } = parse(body);
-  return (
+  const [measuredW, setMeasuredW] = useState(0);
+  const w = width ?? measuredW;
+
+  const svg = (renderW: number) => (
     <Svg
-      width={width}
-      height={width * ar}
+      width={renderW}
+      height={renderW * ar}
       viewBox={`0 0 ${CANVAS_INTERNAL_W} ${CANVAS_INTERNAL_H}`}
       preserveAspectRatio="none"
     >
@@ -231,6 +235,17 @@ export function CanvasView({ body, width = 240 }: CanvasViewProps) {
         />
       ))}
     </Svg>
+  );
+
+  if (width !== undefined) return svg(width);
+
+  return (
+    <View
+      style={{ width: '100%' }}
+      onLayout={(e) => setMeasuredW(e.nativeEvent.layout.width)}
+    >
+      {w > 0 ? svg(w) : null}
+    </View>
   );
 }
 
