@@ -39,15 +39,18 @@ export const useSettingsStore = create<SettingsState>()(
         hourOfDay: 18,
       },
       setReminder: (key, value) =>
-        set((s) => ({
-          reminder: {
-            ...s.reminder,
-            [key]:
-              key === 'hourOfDay'
-                ? Math.max(0, Math.min(23, Math.floor(value)))
-                : Math.max(1, Math.floor(value)),
-          },
-        })),
+        set((s) => {
+          const n = Math.floor(value);
+          const clamped =
+            key === 'hourOfDay'
+              ? Math.max(0, Math.min(23, n))
+              : // remindAfterDays allows 0 for demo/testing; frequencyDays
+                // still requires at least 1 day between pings.
+                key === 'remindAfterDays'
+                ? Math.max(0, n)
+                : Math.max(1, n);
+          return { reminder: { ...s.reminder, [key]: clamped } };
+        }),
     }),
     {
       name: 'qamar.settings.v1',
