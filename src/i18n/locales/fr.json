@@ -1,0 +1,15 @@
+{
+  "app.name": "Qamar",
+  "app.tagline": "Mémorise le Coran, un petit pas à la fois.",
+  "today.title": "Aujourd'hui",
+  "today.continue": "Continuer",
+  "today.review": "Réviser",
+  "today.start_new": "Commencer une nouvelle portion",
+  "state.none": "Non commencé",
+  "state.learning": "En cours",
+  "state.memorized": "Mémorisé",
+  "state.reviewed_now": "Révisé à l'instant ✓",
+  "action.undo": "Annuler",
+  "action.cancel": "Annuler",
+  "reminder.default": "Ta session hifz t'attend"
+}

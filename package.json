@@ -1,0 +1,57 @@
+{
+  "name": "qamar",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Offline-first Quran memorization app for ADHD learners. See SPEC.md.",
+  "license": "MIT",
+  "main": "expo-router/entry",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
+    "lint": "eslint . --ext .ts,.tsx",
+    "typecheck": "tsc --noEmit",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "content:build": "ts-node --transpile-only scripts/build-quran-content.ts",
+    "content:verify": "ts-node --transpile-only scripts/verify-content.ts",
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "expo": "*",
+    "expo-router": "*",
+    "expo-font": "*",
+    "expo-sqlite": "*",
+    "expo-file-system": "*",
+    "expo-av": "*",
+    "react": "*",
+    "react-native": "*",
+    "react-native-reanimated": "*",
+    "react-native-gesture-handler": "*",
+    "react-native-svg": "*",
+    "@shopify/flash-list": "*",
+    "@react-native-async-storage/async-storage": "*",
+    "nativewind": "*",
+    "zustand": "*",
+    "lucide-react-native": "*"
+  },
+  "devDependencies": {
+    "@types/react": "*",
+    "@types/jest": "*",
+    "typescript": "*",
+    "ts-node": "*",
+    "jest": "*",
+    "jest-expo": "*",
+    "@testing-library/react-native": "*",
+    "eslint": "*",
+    "eslint-config-expo": "*",
+    "eslint-config-prettier": "*",
+    "eslint-plugin-prettier": "*",
+    "prettier": "*"
+  },
+  "jest": {
+    "preset": "jest-expo"
+  }
+}

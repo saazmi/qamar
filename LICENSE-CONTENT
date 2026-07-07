@@ -1,0 +1,67 @@
+Content Licenses & Attributions
+================================
+
+The Qamar codebase (SPEC.md §24, §8.5) bundles third-party datasets. Each
+entry below records: source, edition, license, URL, and retrieval date.
+
+This file is populated during Phase 1 (SPEC §25) as the content pipeline
+(`scripts/build-quran-content.ts`) ingests each dataset. The Settings → About
+screen renders these attributions in-app.
+
+--------------------------------------------------------------------------
+1. Quran Arabic Text (Imlaei, Hafs `an `Asim)
+--------------------------------------------------------------------------
+Source:       TBD (candidate: Tanzil.net "Imlaei simple")
+Edition:      TBD
+License:      TBD (Tanzil non-commercial + attribution terms)
+URL:          TBD
+Retrieved:    TBD
+
+--------------------------------------------------------------------------
+2. Quran Arabic Text (Uthmani, Hafs `an `Asim) — optional
+--------------------------------------------------------------------------
+Source:       TBD (candidate: Tanzil.net Uthmani)
+Edition:      TBD
+License:      TBD
+URL:          TBD
+Retrieved:    TBD
+
+--------------------------------------------------------------------------
+3. French Translation
+--------------------------------------------------------------------------
+Source:       TBD (candidate: Muhammad Hamidullah via Tanzil translations)
+Edition:      TBD
+License:      TBD
+URL:          TBD
+Retrieved:    TBD
+
+--------------------------------------------------------------------------
+4. Tajweed Annotations (v1.1, spike-gated — SPEC §8.3)
+--------------------------------------------------------------------------
+Source:       TBD
+Edition:      TBD
+License:      TBD
+URL:          TBD
+Retrieved:    TBD
+
+--------------------------------------------------------------------------
+5. Audio — Qari Recitation
+--------------------------------------------------------------------------
+Qari:         TBD (candidate: Mahmoud Khalil Al-Husary, murattal)
+Host:         TBD (candidate: EveryAyah.com or Quran Foundation CDN)
+Terms:        TBD (redistribution / hotlinking permissions)
+URL:          TBD
+Retrieved:    TBD
+
+--------------------------------------------------------------------------
+6. Fonts
+--------------------------------------------------------------------------
+Arabic primary:   Noto Naskh Arabic — SIL Open Font License 1.1
+                  https://fonts.google.com/noto/specimen/Noto+Naskh+Arabic
+Arabic alt:       Amiri — SIL Open Font License 1.1
+                  https://fonts.google.com/specimen/Amiri
+Latin UI:         Inter — SIL Open Font License 1.1
+                  https://rsms.me/inter/
+
+All Open Font License texts are bundled alongside their respective font
+files in `assets/fonts/`.
