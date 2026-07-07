@@ -81,7 +81,10 @@ export function useAyahTapHandler() {
       if (mode === 'listen') {
         void (async () => {
           await ensureAudioConfigured();
-          await playAyah(surah, ayah);
+          setPlayingAyah({ surah, ayah });
+          await playAyah(surah, ayah, {
+            onFinished: () => setPlayingAyah(null),
+          });
         })();
         return;
       }

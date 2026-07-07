@@ -141,7 +141,13 @@ export function VerseSheet() {
               </Pressable>
             </View>
 
-            <Text style={styles.arabic} selectable>
+            <Text
+              style={[
+                styles.arabic,
+                openVerse && isPlaying(openVerse.surah, openVerse.ayah) && styles.arabicPlaying,
+              ]}
+              selectable
+            >
               {arabicText}
             </Text>
 
@@ -305,6 +311,13 @@ const styles = StyleSheet.create({
     textAlign: 'right',
     writingDirection: 'rtl',
     marginBottom: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
+  arabicPlaying: {
+    backgroundColor: light.state.playingBg,
+    color: light.state.playingMarker,
   },
   stateRow: {
     flexDirection: 'row',
