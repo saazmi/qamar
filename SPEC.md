@@ -505,8 +505,11 @@ The killer feature, analogous to Iqraa's writing canvas in priority and polish b
 ### 11.1 Layout
 
 - Vertical FlashList of **AyahBlock** components for the selected surah. Surah header (name, basmalah where canonical, progress bar) as list header.
-- Each AyahBlock: the ayah's full Arabic text (harakat always on), flowing RTL, ending with an ayah-number marker (۝ + number). Font size from settings (default 28pt equivalent, same rationale as Iqraa's Arabic sizing).
-- **Fragmentation requirement**: each ayah is one discrete tappable block with its own visual state. No continuous-paragraph mushaf flow in v1 — the block *is* the interaction unit.
+- Each AyahBlock: the ayah's full Arabic text (harakat always on), flowing RTL, ending with an ayah-number marker (۝ + Arabic-Indic digit). Font size from settings (default 28pt equivalent, same rationale as Iqraa's Arabic sizing).
+- **Two rendering modes** (owner note 2026-07-07, supersedes the earlier fragmented-only requirement):
+  - **Fragmented** (default when the FR toggle is ON): each ayah is one discrete block with its own visual state (top surline + wash). Translation renders below the block.
+  - **Continuous mushaf** (default when FR toggle is OFF): ayat flow as inline spans inside page-grouped `<Text>` paragraphs (grouped by Madani page from `ayah-index.json` for FlashList virtualization). Each ayah is still individually tappable/long-pressable and carries its own state visuals (background wash + colored ayah marker — no top border, since inline spans can't render borders).
+- **Fragmentation invariant**: whichever mode is active, every ayah remains an individually addressable interaction unit; state changes and taps must not depend on layout mode.
 
 ### 11.2 Visual state encoding
 

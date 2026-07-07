@@ -1,23 +1,34 @@
 // Reading view. SPEC §11 — killer feature.
-// FlashList of AyahBlock; per-verse state; tap=safe, long-press=cycle.
+// Two modes: continuous mushaf (FR off, default) / fragmented + translation (FR on).
 
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { AyahBlock } from '@components/quran/AyahBlock';
+import { ContinuousPage } from '@components/quran/ContinuousPage';
 import structure from '@content/structure.json';
+import ayahIndexJson from '@content/ayah-index.json';
 import { loadSurah } from '@content/text';
 import { loadSurah as loadFrench } from '@content/translation-fr';
-import type { AyahText, SurahMeta } from '@content/types';
+import type { AyahIndex, AyahText, SurahMeta } from '@content/types';
+import { keyOf } from '@core/hifz';
 import { light } from '@theme/colors';
 
 const meta = structure as SurahMeta[];
+const IDX = ayahIndexJson as AyahIndex;
 
-interface Row {
+interface FragmentRow {
+  kind: 'ayah';
   ayah: number;
   text: string;
   french?: string;
+}
+
+interface PageRow {
+  kind: 'page';
+  page: number;
+  ayat: AyahText[];
 }
 
 export default function ReadingViewScreen() {
@@ -28,12 +39,32 @@ export default function ReadingViewScreen() {
 
   const [showFrench, setShowFrench] = useState(false);
 
-  const rows: Row[] = useMemo(() => {
-    const ar = loadSurah(id) ?? [];
-    const fr = loadFrench(id) ?? [];
-    const frByAyah = new Map<number, string>(fr.map((a: AyahText) => [a.ayah, a.text]));
-    return ar.map((a: AyahText) => ({ ayah: a.ayah, text: a.text, french: frByAyah.get(a.ayah) }));
-  }, [id]);
+  const ayat = useMemo(() => loadSurah(id) ?? [], [id]);
+  const french = useMemo(() => loadFrench(id) ?? [], [id]);
+
+  const fragmentRows: FragmentRow[] = useMemo(() => {
+    const frByAyah = new Map<number, string>(french.map((a: AyahText) => [a.ayah, a.text]));
+    return ayat.map((a: AyahText) => ({
+      kind: 'ayah' as const,
+      ayah: a.ayah,
+      text: a.text,
+      french: frByAyah.get(a.ayah),
+    }));
+  }, [ayat, french]);
+
+  const pageRows: PageRow[] = useMemo(() => {
+    const byPage = new Map<number, AyahText[]>();
+    for (const a of ayat) {
+      const entry = IDX[keyOf(id, a.ayah)];
+      const page = entry?.page ?? 0;
+      const list = byPage.get(page) ?? [];
+      list.push(a);
+      byPage.set(page, list);
+    }
+    return [...byPage.entries()]
+      .sort(([p1], [p2]) => p1 - p2)
+      .map(([page, ayahList]) => ({ kind: 'page' as const, page, ayat: ayahList }));
+  }, [ayat, id]);
 
   if (!surahMeta) {
     return (
@@ -60,20 +91,31 @@ export default function ReadingViewScreen() {
         </Pressable>
       </View>
 
-      <FlashList
-        data={rows}
-        keyExtractor={(item) => String(item.ayah)}
-        contentContainerStyle={{ padding: 12, paddingBottom: 96 }}
-        renderItem={({ item }) => (
-          <AyahBlock
-            surah={id}
-            ayah={item.ayah}
-            text={item.text}
-            frenchText={item.french}
-            showFrench={showFrench}
-          />
-        )}
-      />
+      {showFrench ? (
+        <FlashList
+          data={fragmentRows}
+          keyExtractor={(item) => `f${item.ayah}`}
+          contentContainerStyle={{ padding: 12, paddingBottom: 96 }}
+          renderItem={({ item }) => (
+            <AyahBlock
+              surah={id}
+              ayah={item.ayah}
+              text={item.text}
+              frenchText={item.french}
+              showFrench
+            />
+          )}
+        />
+      ) : (
+        <FlashList
+          data={pageRows}
+          keyExtractor={(item) => `p${item.page}`}
+          contentContainerStyle={{ padding: 20, paddingBottom: 96 }}
+          renderItem={({ item }) => (
+            <ContinuousPage surah={id} page={item.page} ayat={item.ayat} />
+          )}
+        />
+      )}
     </View>
   );
 }
