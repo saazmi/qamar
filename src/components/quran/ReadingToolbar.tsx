@@ -2,6 +2,7 @@
 // Tapping the active mode's button clears it back to 'read'.
 
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { stopPlayback } from '@audio/player';
 import { useSessionStore, type ReadingMode } from '@stores/session';
 import { light } from '@theme/colors';
 
@@ -44,7 +45,13 @@ export function ReadingToolbar() {
           return (
             <Pressable
               key={m.key}
-              onPress={() => setMode(active ? 'read' : m.key)}
+              onPress={() => {
+                // Any mode-toggle interrupts in-flight playback so a queued
+                // next-track (basmalah → ayah 1, etc.) doesn't play after the
+                // user has left the mode that started it.
+                void stopPlayback();
+                setMode(active ? 'read' : m.key);
+              }}
               style={[styles.btn, active && styles.btnActive]}
               accessibilityRole="button"
               accessibilityState={{ selected: active }}
