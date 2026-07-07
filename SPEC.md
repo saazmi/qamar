@@ -519,23 +519,40 @@ The killer feature, analogous to Iqraa's writing canvas in priority and polish b
 - `needsReview`: memorized styling + a small leading badge (rotating-arrows glyph). Distinguishable by shape, not color alone (color-blind requirement).
 - State changes animate briefly (150ms wash-in, Reanimated, respects reduce-motion).
 
-### 11.3 Interactions
+### 11.3 Interactions — mode toolbar (revised 2026-07-07)
 
-- **Tap** on an AyahBlock → verse bottom sheet (§11.4). Tap is *safe* — it never mutates state.
-- **Long-press** → quick state cycle `none → learning → memorized → none`, haptic tick, 5s undo snackbar. One-time tooltip on first ever long-press.
-- **Scroll position** is remembered per surah (last-read ayah), restored on reopen.
+Long-press was dropped as the primary state-cycle gesture (owner note: undiscoverable, motor-accessibility-hostile, conflicts with web text-selection). All actions now dispatch on **single tap** and are disambiguated by the active toolbar mode.
 
-### 11.4 Verse bottom sheet
+**Reading toolbar** (sticky sub-header, mutually exclusive modes):
 
-Contents, top to bottom:
-1. Surah:ayah reference + the Arabic text (selectable).
-2. **State controls**: three explicit segmented buttons — `Non commencé / En cours / Mémorisé` — plus, when memorized, a `Révisé à l'instant ✓` action (stamps `lastReviewedAt`).
-3. **Audio bar**: play this ayah, repeat ×3/×5/∞ toggle, playback speed (0.75/1/1.25) (§12).
-4. **Translation**: FR text of this ayah (always shown in the sheet).
-5. **Note**: existing verse note preview or "Ajouter une note" (§13).
-6. Range shortcut: "Marquer jusqu'ici…" (marks from the start of the current contiguous same-state run to this ayah).
+| Mode | Glyph | Tap on a verse |
+|---|---|---|
+| *(none active — default)* | — | no-op (pure reading) |
+| **Marquer** | ● | cycles state `none → learning → memorized → none`, undo toast |
+| **Sélection** | ⇥ | tap 1 = anchor, tap 2 = opens a state-picker sheet with the three state options; applies to the range; undo toast |
+| **Notes** | ✎ | opens the note editor for that verse (§13) |
+| **Écouter** | ▶ | plays audio starting at that verse (stub while D3 open) |
+| **Détails** | ⓘ | opens the verse sheet (§11.4) |
 
-Sheet opens in <100ms perceived; audio and translation load from bundle/cache instantly.
+Tapping the active mode's button clears back to no-active-mode. An instruction bar under the toolbar tells the user what to do next when a mode is active.
+
+**Scroll position** is remembered per surah (last-read ayah), restored on reopen.
+
+**Interaction invariant**: whichever mode is active, tap semantics are identical between fragmented and continuous rendering modes (§11.1).
+
+### 11.4 Verse sheet (opened from Détails mode)
+
+Entry: Détails mode → tap any verse. Contents top to bottom:
+
+1. Surah:ayah reference + transliterated surah name.
+2. Arabic text at 26pt, selectable.
+3. **State controls**: three explicit segmented buttons — `Non commencé / En cours / Mémorisé`. Tap = apply + undo toast.
+4. **Range shortcut** (shown only when the verse continues an existing state run): "Marquer jusqu'ici · N–M".
+5. **Écouter** button: plays this ayah (stub while D3 open, toasts "bientôt disponible").
+6. **Translation**: Hamidullah French text (always shown in the sheet).
+7. **Notes**: read-only preview of every verse-scoped and surah-scoped note attached to this ayah. Each note has an eye toggle (§13.3) that expands it in place.
+
+Sheet opens in <100ms perceived; translation loads from bundle instantly.
 
 ### 11.5 Inline translation toggle
 
@@ -585,28 +602,43 @@ Text is bundled; audio is **streamed then cached, permanently**. After a verse (
 
 ## 13. Notes System
 
-### 13.1 Model
+### 13.1 Model (revised 2026-07-07 — text + canvas kinds)
 
 ```
 Note {
-  id: uuid
+  id: string
   scope: "ayah" | "surah"
+  kind: "text" | "canvas"    // exclusive per note; no mixing
   surah: 1..114
   ayah?: number              // present iff scope = "ayah"
-  body: string               // plain text, max 5,000 chars
+  body: string
   createdAt / updatedAt: ISO8601
 }
 ```
 
-- Multiple notes per verse/surah allowed.
-- Plain text v1 (no markdown rendering; store as-is so v2 can upgrade rendering without migration).
+- Multiple notes per verse/surah allowed. Each note is one kind only — text or canvas — no mixed rich content (owner constraint 2026-07-07: keep it simple).
+- **Text kind**: `body` is the raw text, max 5,000 chars. No markdown v1; storage stays raw so v2 can upgrade rendering without migration.
+- **Canvas kind**: `body` is `JSON.stringify({ ar, strokes })` where `ar` is the aspect ratio (height/width) captured at draw time, and `strokes` is an array of polylines in a fixed 800×1200 internal coordinate space (`{ c: color, w: strokeWidth, p: [[x,y]...] }`). Character cap does not apply. Legacy notes without `kind` are migrated to `text` on load; legacy canvas bodies stored as bare stroke arrays parse to `ar = 1.5`.
+- **Storage note**: current persistence layer is AsyncStorage (v1). Handwritten canvas notes can push past Android's default 6 MB app-scoped AsyncStorage limit; the editor toasts a warning when the notes payload passes 4 MB. A follow-up moves canvas bodies to `expo-file-system` (one file per note, only the id in the store) before v1 ship if heavy note-taking is expected.
 
 ### 13.2 UX
 
-- Verse notes: created/edited from the verse bottom sheet. An AyahBlock with a note shows a tiny note glyph in its margin.
-- Surah notes: from the surah header overflow menu; shown at top of the reading view collapsed ("1 note de sourate ▸").
-- Notes screen (`notes/index.tsx`): all notes, newest first, filter by surah, full-text search (SQLite `LIKE` is sufficient at this scale; FTS5 if trivially available in expo-sqlite).
-- Deleting a note = soft confirm via undo snackbar, consistent with the no-modal-confirm doctrine.
+- **Notes mode** (§11.3) opens a full-screen editor sheet on tap. The editor has:
+  - existing notes list (each note shown as a small artifact — canvas thumbnail or 2-line text preview)
+  - a T / ✎ toggle to pick the kind of the next new note
+  - text area or drawing canvas depending on the toggle
+  - `Ajouter` button to commit the new note
+- **In-place expand** via an eye icon on each note card (both editor and Détails sheet). Tap → the note fills the sheet width in place (read-only). Tap again → collapse. No new modal, no navigation.
+- **Ayah glyph** (SPEC §11): a small gold ✎ appears just before the ayah marker (`✎ ۝5`) whenever the verse has at least one note. Renders in both fragmented and continuous views.
+- **Surah notes** (planned): overflow menu on surah header opens the same editor with `scope='surah'`. Rendered read-only in the Détails sheet alongside verse notes.
+- **Notes screen** (`notes/index.tsx`, planned): all notes, newest first, filter by surah, full-text search (SQLite `LIKE` at this scale; FTS5 if trivially available in expo-sqlite).
+- **Delete** = 5-second undo snackbar, no modal confirm (SPEC §15.3). Undo restores the full note kind + body.
+
+### 13.3 Canvas rendering
+
+- Editor `Canvas` component: PanResponder captures pointer input, `react-native-svg` renders polylines. Minimum 3-pixel distance between recorded points (in internal coords) → 40–60% fewer stored points with no visible quality loss. Height capped at 60% of window; width fills the container.
+- Read-only `CanvasView`: renders the stored strokes at the note's saved aspect ratio. Optional `width` prop fixes size (used for thumbnails); omitted, the view measures its container and fills it (used for the in-place expanded state).
+- All polylines use `vectorEffect="non-scaling-stroke"` so pen thickness stays in display pixels regardless of aspect stretch.
 
 ---
 
@@ -646,6 +678,7 @@ The mechanism from the owner's earlier tracker spec, restated as normative here.
 Normative constraints. Every screen and copy string is reviewed against this list.
 
 1. **≤3 choices at any decision point.** The Today screen's three cards, the three state buttons, the three repeat options. If a design needs a fourth option, redesign it.
+   - **Owner override 2026-07-07**: the reading toolbar (§11.3) has five mode buttons (Marquer / Sélection / Notes / Écouter / Détails). Accepted as a mode-picker rather than a decision-point: the surrounding *reading* action doesn't demand a choice, and modes are persistent + interchangeable rather than terminal branches. Individual sheets (state picker, Détails buttons) still respect the ≤3 rule.
 2. **≤2 taps to any primary action** from the relevant screen (state change, play, mark reviewed).
 3. **Undo, never confirm.** Destructive-feeling actions get a 5s undo snackbar. Modal confirmations are banned except for data export/delete-all.
 4. **No backlog visibility.** Overdue counts, red badges, and "you missed N days" copy are banned app-wide.
