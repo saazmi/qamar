@@ -112,7 +112,8 @@ const AyahSpan = memo(function AyahSpan({
       onPress={onPress}
       onPressIn={onPressIn}
       onPressOut={onPressOut}
-      style={bg ? { backgroundColor: bg } : undefined}
+      selectable={false}
+      style={[NO_SELECT, bg ? { backgroundColor: bg } : null] as any}
     >
       {text}
       <Text style={[styles.marker, { color: markerColor }]}>
@@ -173,10 +174,12 @@ export const ContinuousPage = memo(function ContinuousPage({
         <Text style={styles.pageLabel}>page {toArabicIndic(page)}</Text>
       </View>
       <Text
+        selectable={false}
         style={[
           styles.arabic,
+          NO_SELECT,
           { fontSize, lineHeight: Math.round(fontSize * 1.95) },
-        ]}
+        ] as any}
       >
         {ayat.map((a) => (
           <AyahSpan
@@ -216,8 +219,17 @@ const styles = StyleSheet.create({
     writingDirection: 'rtl',
     color: light.text,
   },
+  span: {},
   marker: {
     fontSize: 22,
     fontFamily: 'NotoNaskhArabic_400Regular',
   },
 });
+
+// Web-only: prevent long-press → text-selection hijack.
+// These CSS props aren't in RN's TextStyle typing, so applied as untyped.
+const NO_SELECT = {
+  userSelect: 'none',
+  WebkitUserSelect: 'none',
+  WebkitTouchCallout: 'none',
+} as unknown as Record<string, string>;
