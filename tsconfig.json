@@ -6,22 +6,47 @@
     "noImplicitOverride": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
-      "@core/*": ["src/core/*"],
-      "@components/*": ["src/components/*"],
-      "@content/*": ["src/content/*"],
-      "@db/*": ["src/db/*"],
-      "@audio/*": ["src/audio/*"],
-      "@stores/*": ["src/stores/*"],
-      "@theme/*": ["src/theme/*"],
-      "@i18n/*": ["src/i18n/*"]
+      "@/*": [
+        "src/*"
+      ],
+      "@core/*": [
+        "src/core/*"
+      ],
+      "@components/*": [
+        "src/components/*"
+      ],
+      "@content/*": [
+        "src/content/*"
+      ],
+      "@db/*": [
+        "src/db/*"
+      ],
+      "@audio/*": [
+        "src/audio/*"
+      ],
+      "@stores/*": [
+        "src/stores/*"
+      ],
+      "@theme/*": [
+        "src/theme/*"
+      ],
+      "@i18n/*": [
+        "src/i18n/*"
+      ]
     }
   },
   "include": [
     "src/**/*",
     "scripts/**/*",
     "tests/**/*",
-    "app.json"
+    "app.json",
+    "nativewind-env.d.ts",
+    ".expo/types/**/*.ts",
+    "expo-env.d.ts"
   ],
-  "exclude": ["node_modules", "dist", "build"]
+  "exclude": [
+    "node_modules",
+    "dist",
+    "build"
+  ]
 }
