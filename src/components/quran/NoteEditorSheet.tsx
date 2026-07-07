@@ -331,7 +331,7 @@ const styles = StyleSheet.create({
   },
   sheet: {
     flex: 1,
-    backgroundColor: light.surface,
+    backgroundColor: light.bg,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
   },
