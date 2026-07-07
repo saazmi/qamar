@@ -8,6 +8,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { AyahBlock } from '@components/quran/AyahBlock';
 import { ContinuousPage } from '@components/quran/ContinuousPage';
+import { NoteEditorSheet } from '@components/quran/NoteEditorSheet';
 import { RangeStateSheet } from '@components/quran/RangeStateSheet';
 import { ReadingToolbar } from '@components/quran/ReadingToolbar';
 import { VerseSheet } from '@components/quran/VerseSheet';
@@ -44,6 +45,7 @@ export default function ReadingViewScreen() {
   const [showFrench, setShowFrench] = useState(false);
   const openVerse = useSessionStore((s) => s.openVerse);
   const rangeSelection = useSessionStore((s) => s.rangeSelection);
+  const noteEditor = useSessionStore((s) => s.noteEditor);
   const onTap = useAyahTapHandler();
 
   const ayat = useMemo(() => loadSurah(id) ?? [], [id]);
@@ -127,6 +129,7 @@ export default function ReadingViewScreen() {
       )}
       {openVerse && <VerseSheet />}
       {rangeSelection && <RangeStateSheet />}
+      {noteEditor && <NoteEditorSheet />}
     </View>
   );
 }

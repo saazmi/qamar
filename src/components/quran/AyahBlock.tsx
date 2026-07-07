@@ -5,6 +5,7 @@
 import { memo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useHifzStore } from '@stores/hifz';
+import { useNotesStore } from '@stores/notes';
 import { light } from '@theme/colors';
 import type { AyahState } from '@core/hifz';
 
@@ -33,6 +34,9 @@ export const AyahBlock = memo(function AyahBlock({
   onTap,
 }: Props) {
   const state = useHifzStore((s) => stateOf(s.records, surah, ayah));
+  const hasNote = useNotesStore((s) =>
+    s.notes.some((n) => n.scope === 'ayah' && n.surah === surah && n.ayah === ayah),
+  );
 
   const style = [
     styles.block,
@@ -52,6 +56,7 @@ export const AyahBlock = memo(function AyahBlock({
         <Text style={[styles.arabic, { fontSize, lineHeight: Math.round(fontSize * 1.85) }]}>
           {text} <Text style={styles.marker}>﴿{ayah}﴾</Text>
         </Text>
+        {hasNote && <Text style={styles.noteGlyph}>✎</Text>}
       </View>
       {showFrench && frenchText ? <Text style={styles.french}>{frenchText}</Text> : null}
     </Pressable>
@@ -118,5 +123,10 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     color: light.textMuted,
     marginTop: 8,
+  },
+  noteGlyph: {
+    fontSize: 14,
+    color: light.accentSecondary,
+    marginTop: 4,
   },
 });

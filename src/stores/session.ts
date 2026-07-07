@@ -31,6 +31,10 @@ interface SessionState {
 
   rangeSelection: RangeSelection | null;
   setRangeSelection: (v: RangeSelection | null) => void;
+
+  noteEditor: OpenVerse | null;
+  openNoteEditor: (surah: number, ayah: number) => void;
+  closeNoteEditor: () => void;
 }
 
 export const useSessionStore = create<SessionState>((set) => ({
@@ -46,4 +50,8 @@ export const useSessionStore = create<SessionState>((set) => ({
 
   rangeSelection: null,
   setRangeSelection: (v) => set({ rangeSelection: v }),
+
+  noteEditor: null,
+  openNoteEditor: (surah, ayah) => set({ noteEditor: { surah, ayah } }),
+  closeNoteEditor: () => set({ noteEditor: null }),
 }));

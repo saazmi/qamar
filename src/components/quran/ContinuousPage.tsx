@@ -5,6 +5,7 @@
 import { memo, useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { useHifzStore } from '@stores/hifz';
+import { useNotesStore } from '@stores/notes';
 import { light } from '@theme/colors';
 import type { AyahState } from '@core/hifz';
 
@@ -57,6 +58,7 @@ export const ContinuousPage = memo(function ContinuousPage({
   onTap,
 }: Props) {
   const records = useHifzStore((s) => s.records);
+  const allNotes = useNotesStore((s) => s.notes);
 
   const stateBySeq = useMemo(() => {
     const map = new Map<number, AyahState>();
@@ -66,6 +68,16 @@ export const ContinuousPage = memo(function ContinuousPage({
     }
     return map;
   }, [records, surah, ayat]);
+
+  const noteSet = useMemo(() => {
+    const set = new Set<number>();
+    for (const n of allNotes) {
+      if (n.scope === 'ayah' && n.surah === surah && typeof n.ayah === 'number') {
+        set.add(n.ayah);
+      }
+    }
+    return set;
+  }, [allNotes, surah]);
 
   return (
     <View style={styles.page}>
@@ -90,7 +102,11 @@ export const ContinuousPage = memo(function ContinuousPage({
               {a.text}
               <Text style={[styles.marker, { color: markerColor }]}>
                 {' '}
-                ۝{toArabicIndic(a.ayah)}{' '}
+                ۝{toArabicIndic(a.ayah)}
+                {noteSet.has(a.ayah) ? (
+                  <Text style={styles.noteGlyph}> ✎</Text>
+                ) : null}
+                {' '}
               </Text>
             </Text>
           );
@@ -125,5 +141,9 @@ const styles = StyleSheet.create({
   marker: {
     fontSize: 22,
     fontFamily: 'NotoNaskhArabic_400Regular',
+  },
+  noteGlyph: {
+    fontSize: 16,
+    color: light.accentSecondary,
   },
 });

@@ -1,0 +1,323 @@
+// Verse-scoped note editor. Opens when Notes mode + tap on an ayah.
+// Lists existing notes for that verse; each note is editable inline;
+// delete = undo-toast (no modal confirm — SPEC §15.3).
+
+import { useMemo, useState } from 'react';
+import {
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
+import structure from '@content/structure.json';
+import { loadSurah } from '@content/text';
+import type { AyahText, SurahMeta } from '@content/types';
+import { useNotesStore, type Note } from '@stores/notes';
+import { useSessionStore } from '@stores/session';
+import { useUiStore } from '@stores/ui';
+import { light } from '@theme/colors';
+
+const META = structure as SurahMeta[];
+const MAX_BODY = 5000;
+
+export function NoteEditorSheet() {
+  const target = useSessionStore((s) => s.noteEditor);
+  const close = useSessionStore((s) => s.closeNoteEditor);
+  const allNotes = useNotesStore((s) => s.notes);
+  const addNote = useNotesStore((s) => s.addNote);
+  const updateNote = useNotesStore((s) => s.updateNote);
+  const removeNote = useNotesStore((s) => s.removeNote);
+  const showToast = useUiStore((s) => s.showToast);
+
+  const [draft, setDraft] = useState('');
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingBody, setEditingBody] = useState('');
+
+  const meta = target ? META.find((m) => m.id === target.surah) : undefined;
+  const arabicText = useMemo(() => {
+    if (!target) return '';
+    const list = loadSurah(target.surah) ?? [];
+    return list.find((a: AyahText) => a.ayah === target.ayah)?.text ?? '';
+  }, [target]);
+
+  const verseNotes = useMemo(() => {
+    if (!target) return [] as Note[];
+    return allNotes.filter(
+      (n) => n.scope === 'ayah' && n.surah === target.surah && n.ayah === target.ayah,
+    );
+  }, [allNotes, target]);
+
+  if (!target || !meta) return null;
+
+  const handleAdd = () => {
+    const body = draft.trim();
+    if (!body) return;
+    addNote({ scope: 'ayah', surah: target.surah, ayah: target.ayah, body });
+    setDraft('');
+  };
+
+  const handleUpdate = (id: string) => {
+    const body = editingBody.trim();
+    if (!body) return;
+    updateNote(id, body);
+    setEditingId(null);
+    setEditingBody('');
+  };
+
+  const handleDelete = (note: Note) => {
+    removeNote(note.id);
+    const preview = note.body.slice(0, 40) + (note.body.length > 40 ? '…' : '');
+    showToast({
+      message: `Note supprimée · ${preview}`,
+      actionLabel: 'Annuler',
+      onAction: () => {
+        addNote({
+          scope: 'ayah',
+          surah: note.surah,
+          ayah: note.ayah,
+          body: note.body,
+        });
+      },
+    });
+  };
+
+  const startEdit = (note: Note) => {
+    setEditingId(note.id);
+    setEditingBody(note.body);
+  };
+
+  return (
+    <Modal
+      visible
+      transparent
+      animationType="slide"
+      onRequestClose={close}
+      statusBarTranslucent
+    >
+      <Pressable style={styles.scrim} onPress={close}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          style={styles.avoider}
+        >
+          <Pressable style={styles.sheet} onPress={(e) => e.stopPropagation?.()}>
+            <ScrollView contentContainerStyle={{ padding: 20 }} keyboardShouldPersistTaps="handled">
+              <View style={styles.grabber} />
+
+              <View style={styles.headerRow}>
+                <Text style={styles.ref}>
+                  {meta.nameTransliterated} · {target.surah}:{target.ayah}
+                </Text>
+                <Pressable onPress={close} hitSlop={12}>
+                  <Text style={styles.close}>×</Text>
+                </Pressable>
+              </View>
+
+              <Text style={styles.arabic} selectable>
+                {arabicText}
+              </Text>
+
+              <Text style={styles.sectionLabel}>Notes existantes</Text>
+              {verseNotes.length === 0 ? (
+                <Text style={styles.empty}>Aucune note pour ce verset.</Text>
+              ) : (
+                verseNotes.map((n) => (
+                  <View key={n.id} style={styles.noteCard}>
+                    {editingId === n.id ? (
+                      <>
+                        <TextInput
+                          value={editingBody}
+                          onChangeText={setEditingBody}
+                          multiline
+                          maxLength={MAX_BODY}
+                          style={styles.input}
+                          placeholder="Modifier la note…"
+                          placeholderTextColor={light.textMuted}
+                        />
+                        <View style={styles.actionsRow}>
+                          <Pressable onPress={() => setEditingId(null)} hitSlop={8}>
+                            <Text style={styles.actionMuted}>Annuler</Text>
+                          </Pressable>
+                          <Pressable onPress={() => handleUpdate(n.id)} hitSlop={8}>
+                            <Text style={styles.action}>Enregistrer</Text>
+                          </Pressable>
+                        </View>
+                      </>
+                    ) : (
+                      <>
+                        <Text style={styles.noteBody}>{n.body}</Text>
+                        <View style={styles.actionsRow}>
+                          <Pressable onPress={() => handleDelete(n)} hitSlop={8}>
+                            <Text style={styles.actionMuted}>Supprimer</Text>
+                          </Pressable>
+                          <Pressable onPress={() => startEdit(n)} hitSlop={8}>
+                            <Text style={styles.action}>Modifier</Text>
+                          </Pressable>
+                        </View>
+                      </>
+                    )}
+                  </View>
+                ))
+              )}
+
+              <Text style={styles.sectionLabel}>Nouvelle note</Text>
+              <TextInput
+                value={draft}
+                onChangeText={setDraft}
+                multiline
+                maxLength={MAX_BODY}
+                placeholder="Écrivez une note…"
+                placeholderTextColor={light.textMuted}
+                style={styles.input}
+              />
+              <Pressable
+                onPress={handleAdd}
+                disabled={!draft.trim()}
+                style={[styles.addBtn, !draft.trim() && styles.addBtnDisabled]}
+              >
+                <Text
+                  style={[styles.addLabel, !draft.trim() && styles.addLabelDisabled]}
+                >
+                  Ajouter
+                </Text>
+              </Pressable>
+            </ScrollView>
+          </Pressable>
+        </KeyboardAvoidingView>
+      </Pressable>
+    </Modal>
+  );
+}
+
+const styles = StyleSheet.create({
+  scrim: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.45)',
+    justifyContent: 'flex-end',
+  },
+  avoider: {
+    justifyContent: 'flex-end',
+  },
+  sheet: {
+    backgroundColor: light.surface,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    maxHeight: '90%',
+  },
+  grabber: {
+    width: 36,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: '#DED7CB',
+    alignSelf: 'center',
+    marginBottom: 12,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  ref: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 14,
+    color: light.textMuted,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  close: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 26,
+    color: light.textMuted,
+    marginTop: -4,
+  },
+  arabic: {
+    fontFamily: 'NotoNaskhArabic_400Regular',
+    fontSize: 22,
+    lineHeight: 40,
+    color: light.text,
+    textAlign: 'right',
+    writingDirection: 'rtl',
+    marginBottom: 16,
+  },
+  sectionLabel: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 11,
+    color: light.textMuted,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  empty: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 13,
+    color: light.textMuted,
+    fontStyle: 'italic',
+  },
+  noteCard: {
+    padding: 12,
+    borderRadius: 8,
+    backgroundColor: '#F5EFE4',
+    borderLeftWidth: 3,
+    borderLeftColor: light.accentSecondary,
+    marginBottom: 8,
+  },
+  noteBody: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 14,
+    lineHeight: 20,
+    color: light.text,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#EEE7DD',
+    borderRadius: 8,
+    padding: 12,
+    minHeight: 80,
+    fontFamily: 'Inter_400Regular',
+    fontSize: 14,
+    lineHeight: 20,
+    color: light.text,
+    backgroundColor: '#FFFFFF',
+    textAlignVertical: 'top' as const,
+  },
+  actionsRow: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    gap: 16,
+    marginTop: 8,
+  },
+  action: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 13,
+    color: light.accent,
+  },
+  actionMuted: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 13,
+    color: light.textMuted,
+  },
+  addBtn: {
+    marginTop: 8,
+    paddingVertical: 14,
+    borderRadius: 10,
+    backgroundColor: light.accent,
+    alignItems: 'center',
+  },
+  addBtnDisabled: {
+    backgroundColor: '#DED7CB',
+  },
+  addLabel: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 14,
+    color: '#FFFFFF',
+  },
+  addLabelDisabled: {
+    color: light.textMuted,
+  },
+});

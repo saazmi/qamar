@@ -17,6 +17,7 @@ export function useAyahTapHandler() {
   const setRangeAnchor = useSessionStore((s) => s.setRangeAnchor);
   const setRangeSelection = useSessionStore((s) => s.setRangeSelection);
   const openVerseSheet = useSessionStore((s) => s.openVerseSheet);
+  const openNoteEditor = useSessionStore((s) => s.openNoteEditor);
 
   const setState = useHifzStore((s) => s.setState);
   const undo = useHifzStore((s) => s.undo);
@@ -53,7 +54,7 @@ export function useAyahTapHandler() {
       }
 
       if (mode === 'notes') {
-        showToast({ message: 'Notes — bientôt disponibles' });
+        openNoteEditor(surah, ayah);
         return;
       }
 
@@ -79,6 +80,7 @@ export function useAyahTapHandler() {
       undo,
       showToast,
       openVerseSheet,
+      openNoteEditor,
     ],
   );
 }
