@@ -129,7 +129,7 @@ A 19-year-old student, no ADHD, simply wants a clean free hifz tracker. He must 
 - Dashboard: surah grid views, juz completion rings, activity heatmap (§10.5)
 - Full offline support for everything except first-time audio fetch
 - French UI (i18n-ready for more)
-- iOS and Android targets (web is a v1.1 stretch, see §6 note)
+- iOS, Android, **and web** targets — web ships in v1 with feature parity minus audio playback (see §6, §12.5, §18.1)
 - Local-only storage (SQLite); JSON export/import backup (§19.4)
 - No backend, no accounts
 
@@ -138,7 +138,7 @@ A 19-year-old student, no ADHD, simply wants a clean free hifz tracker. He must 
 - **Tajweed coloring** of the Arabic text (letters colored by rule), behind a settings toggle — contingent on the data spike in §8.3
 - Second qari option
 - Blind-recitation test mode (hide text, reveal word-by-word, log hesitations)
-- Web/PWA target
+- Audio on web (platform-branching cache to IndexedDB / Cache API — see §12.5)
 - Additional UI languages (English, Arabic)
 
 ### v2.0 — Backend era
@@ -206,7 +206,11 @@ Inherited from Iqraa verbatim unless noted. The agent should not substitute alte
 | **React Native** | Pinned to Expo SDK | UI framework. |
 | **Expo Router** | Latest stable | File-based routing. |
 
-**Note on web**: Iqraa targets web from v1. This app does **not** — bundling the full Quran text is fine on web, but the audio cache story (expo-file-system) and long-list performance of 286-verse surahs need native first. Architect nothing that *blocks* web (no native-only modules outside the audio layer), but ship iOS/Android in v1.0 and treat web as v1.1.
+**Note on web** (revised): web ships as a v1 target alongside iOS/Android, with **feature parity minus audio playback**. The two original blockers are resolved as follows:
+1. *Audio cache* is native-locked via `expo-file-system`; on web the audio controls render a "install the mobile app" notice instead. Full audio-on-web moves to v1.1 (see §12.5).
+2. *Long-list perf*: FlashList's web build must be measured on the reference desktop target (mid-range laptop, latest Chromium) before ship — same 60fps goal as native (§11.6), applied to the web mid-range target instead of the Android low-end target.
+
+Everything else (text, states, notes, scheduler, dashboard, export/import) must work on web from v1.0.
 
 ### UI and styling
 
@@ -537,6 +541,7 @@ A header toggle shows/hides a smaller FR line under every AyahBlock. Default **o
 
 - 60fps scroll through Al-Baqarah (286 blocks) on a 2-year-old mid-range Android device. FlashList with fixed-estimate item sizing; Arabic text blocks must not remeasure on state change (state wash is an overlay, not a layout change).
 - Cold open of the reading view <400ms after tap from surah list.
+- **Web target**: 60fps scroll through Al-Baqarah on a mid-range laptop / latest Chromium. Measured before ship; if FlashList's web build cannot hit it, fall back to a windowed plain-DOM renderer inside the AyahBlock layer without changing the component API.
 
 ---
 
@@ -570,6 +575,7 @@ Text is bundled; audio is **streamed then cached, permanently**. After a verse (
 - Speed 0.75/1.0/1.25 (expo-av rate with pitch correction).
 - Audio keeps playing with screen off (background audio mode enabled in app config).
 - Offline + uncached: play button shows a subtle cloud-off icon; tapping explains and offers to queue the download. Never a modal error.
+- **On web (v1)**: audio controls render a subtle "Écoute disponible sur l'app mobile" notice with a link to the store listings, instead of a play button. All other verse-sheet controls (state, translation, notes) remain fully functional. Audio-on-web is v1.1 (see §4).
 
 ---
 
@@ -702,9 +708,11 @@ New composite components this app owns: `AyahBlock`, `AyahGrid`, `StateSegmented
 
 Quran text (all scripts bundled), structure, translation, all tracking and state changes, notes, scheduler and review sessions, dashboard, settings, previously cached/downloaded audio, export/import.
 
+**Web target**: same offline guarantees via a Service Worker cache of the app shell + bundled content assets. First visit fetches over network; subsequent visits work fully offline (audio excepted — see §12.5). User state persists via `expo-sqlite`'s web build (WASM + IndexedDB) — no data crosses the network in v1 (§4, §20).
+
 ### 18.2 Requires network
 
-Only: first-time fetch of an uncached audio file, and the download manager. Both degrade gracefully (§12.5); network state never blocks or delays any non-audio interaction.
+Only: first-time fetch of an uncached audio file (native), the download manager (native), and — on web — the very first visit to warm the Service Worker cache. Everything degrades gracefully (§12.5); network state never blocks or delays any non-audio interaction.
 
 ### 18.3 Budget
 

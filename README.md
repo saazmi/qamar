@@ -18,6 +18,8 @@ See [SPEC.md](SPEC.md) — the single source of truth for what, why, and how.
 
 Expo (React Native) · TypeScript · Expo Router · NativeWind · Zustand · expo-sqlite · expo-av · FlashList. See SPEC §6.
 
+**Targets**: iOS · Android · **Web** (v1 ships web with feature parity minus audio playback — see SPEC §4, §6, §12.5).
+
 ## Development
 
 ```bash
