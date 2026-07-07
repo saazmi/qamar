@@ -288,17 +288,17 @@ function parseSafe(body: string): [] {
 const styles = StyleSheet.create({
   scrim: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.45)',
-    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0,0,0,0.55)',
+    paddingTop: 32,
   },
   avoider: {
-    justifyContent: 'flex-end',
+    flex: 1,
   },
   sheet: {
+    flex: 1,
     backgroundColor: light.surface,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    maxHeight: '92%',
   },
   grabber: {
     width: 36,
@@ -382,10 +382,10 @@ const styles = StyleSheet.create({
     color: light.text,
   },
   canvasViewWrap: {
-    alignItems: 'center',
     backgroundColor: '#FFFFFF',
     borderRadius: 8,
     padding: 8,
+    alignItems: 'stretch',
   },
   input: {
     borderWidth: 1,

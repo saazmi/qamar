@@ -10,11 +10,14 @@ import { PanResponder, Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Polyline } from 'react-native-svg';
 import { light } from '@theme/colors';
 
-export const CANVAS_W = 320;
-export const CANVAS_H = 420;
-// Minimum pixel distance between recorded points. Filters redundant samples
-// during handwriting → typically 40–60% fewer points, no visible quality loss.
-const MIN_POINT_DISTANCE = 2;
+// Internal coordinate space for stored strokes. Display width adapts to
+// container; touches are translated back to this fixed grid so notes render
+// consistently at any display size.
+export const CANVAS_INTERNAL_W = 800;
+export const CANVAS_INTERNAL_H = 1200;
+// Minimum pixel distance between recorded points (in *internal* coords).
+// Filters redundant samples during handwriting.
+const MIN_POINT_DISTANCE = 3;
 
 export interface CanvasStroke {
   c: string;
@@ -32,6 +35,7 @@ interface CanvasProps {
   initialStrokes?: CanvasStroke[];
   color?: string;
   strokeWidth?: number;
+  aspectRatio?: number; // internal H / internal W → display height = width * aspectRatio
 }
 
 function parse(body: string): CanvasStroke[] {
@@ -44,12 +48,22 @@ function parse(body: string): CanvasStroke[] {
 }
 
 export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas(
-  { initialStrokes = [], color = light.text, strokeWidth = 3 },
+  {
+    initialStrokes = [],
+    color = light.text,
+    strokeWidth = 3,
+    aspectRatio = CANVAS_INTERNAL_H / CANVAS_INTERNAL_W,
+  },
   ref,
 ) {
   const [strokes, setStrokes] = useState<CanvasStroke[]>(initialStrokes);
+  const [displayW, setDisplayW] = useState(0);
   const currentRef = useRef<CanvasStroke | null>(null);
+  const scaleRef = useRef(1);
   const [tick, setTick] = useState(0);
+
+  scaleRef.current = displayW > 0 ? CANVAS_INTERNAL_W / displayW : 1;
+  const displayH = displayW * aspectRatio;
 
   const responder = useMemo(
     () =>
@@ -57,21 +71,19 @@ export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas(
         onStartShouldSetPanResponder: () => true,
         onMoveShouldSetPanResponder: () => true,
         onPanResponderGrant: (e) => {
-          const { locationX, locationY } = e.nativeEvent;
-          const stroke: CanvasStroke = {
-            c: color,
-            w: strokeWidth,
-            p: [[Math.round(locationX), Math.round(locationY)]],
-          };
+          const s = scaleRef.current;
+          const x = Math.round(e.nativeEvent.locationX * s);
+          const y = Math.round(e.nativeEvent.locationY * s);
+          const stroke: CanvasStroke = { c: color, w: strokeWidth, p: [[x, y]] };
           currentRef.current = stroke;
           setTick((t) => t + 1);
         },
         onPanResponderMove: (e) => {
           const cur = currentRef.current;
           if (!cur) return;
-          const { locationX, locationY } = e.nativeEvent;
-          const x = Math.round(locationX);
-          const y = Math.round(locationY);
+          const s = scaleRef.current;
+          const x = Math.round(e.nativeEvent.locationX * s);
+          const y = Math.round(e.nativeEvent.locationY * s);
           const last = cur.p[cur.p.length - 1];
           if (last) {
             const dx = x - last[0];
@@ -106,38 +118,7 @@ export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas(
   const preview = currentRef.current;
 
   return (
-    <View>
-      <View
-        {...responder.panHandlers}
-        style={styles.canvas}
-        collapsable={false}
-      >
-        <Svg width={CANVAS_W} height={CANVAS_H}>
-          {strokes.map((s, i) => (
-            <Polyline
-              key={i}
-              points={s.p.map(([x, y]) => `${x},${y}`).join(' ')}
-              stroke={s.c}
-              strokeWidth={s.w}
-              fill="none"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          ))}
-          {preview && preview.p.length > 0 && (
-            <Polyline
-              // tick is a state dep; suppress unused-var by referencing.
-              key={`preview-${tick}`}
-              points={preview.p.map(([x, y]) => `${x},${y}`).join(' ')}
-              stroke={preview.c}
-              strokeWidth={preview.w}
-              fill="none"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          )}
-        </Svg>
-      </View>
+    <View style={styles.wrap}>
       <View style={styles.controlsRow}>
         <Pressable
           onPress={() => {
@@ -145,11 +126,48 @@ export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas(
           }}
           hitSlop={8}
         >
-          <Text style={styles.controlLabel}>Annuler dernier trait</Text>
+          <Text style={styles.controlLabel}>Annuler trait</Text>
         </Pressable>
         <Pressable onPress={() => setStrokes([])} hitSlop={8}>
           <Text style={styles.controlLabelMuted}>Effacer</Text>
         </Pressable>
+      </View>
+      <View
+        {...responder.panHandlers}
+        onLayout={(e) => setDisplayW(e.nativeEvent.layout.width)}
+        style={[styles.canvas, { height: displayH || 300 }]}
+        collapsable={false}
+      >
+        {displayW > 0 && (
+          <Svg
+            width={displayW}
+            height={displayH}
+            viewBox={`0 0 ${CANVAS_INTERNAL_W} ${CANVAS_INTERNAL_H}`}
+          >
+            {strokes.map((s, i) => (
+              <Polyline
+                key={i}
+                points={s.p.map(([x, y]) => `${x},${y}`).join(' ')}
+                stroke={s.c}
+                strokeWidth={s.w}
+                fill="none"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            ))}
+            {preview && preview.p.length > 0 && (
+              <Polyline
+                key={`preview-${tick}`}
+                points={preview.p.map(([x, y]) => `${x},${y}`).join(' ')}
+                stroke={preview.c}
+                strokeWidth={preview.w}
+                fill="none"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            )}
+          </Svg>
+        )}
       </View>
     </View>
   );
@@ -157,13 +175,22 @@ export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas(
 
 interface CanvasViewProps {
   body: string;
-  scale?: number;
+  width?: number;
+  aspectRatio?: number;
 }
 
-export function CanvasView({ body, scale = 1 }: CanvasViewProps) {
+export function CanvasView({
+  body,
+  width = 240,
+  aspectRatio = CANVAS_INTERNAL_H / CANVAS_INTERNAL_W,
+}: CanvasViewProps) {
   const strokes = parse(body);
   return (
-    <Svg width={CANVAS_W * scale} height={CANVAS_H * scale} viewBox={`0 0 ${CANVAS_W} ${CANVAS_H}`}>
+    <Svg
+      width={width}
+      height={width * aspectRatio}
+      viewBox={`0 0 ${CANVAS_INTERNAL_W} ${CANVAS_INTERNAL_H}`}
+    >
       {strokes.map((s, i) => (
         <Polyline
           key={i}
@@ -184,21 +211,22 @@ export function parseStrokes(body: string): CanvasStroke[] {
 }
 
 const styles = StyleSheet.create({
+  wrap: {
+    width: '100%',
+  },
   canvas: {
-    width: CANVAS_W,
-    height: CANVAS_H,
+    width: '100%',
     backgroundColor: '#FFFFFF',
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#EEE7DD',
-    alignSelf: 'center',
     overflow: 'hidden',
   },
   controlsRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 8,
-    paddingHorizontal: 8,
+    marginBottom: 8,
+    paddingHorizontal: 4,
   },
   controlLabel: {
     fontFamily: 'Inter_600SemiBold',

@@ -192,7 +192,7 @@ export function VerseSheet() {
                       <Text style={styles.noteScope}>Verset · {n.kind === 'canvas' ? 'dessin' : 'texte'}</Text>
                       {n.kind === 'canvas' ? (
                         <View style={styles.canvasWrap}>
-                          <CanvasView body={n.body} scale={0.7} />
+                          <CanvasView body={n.body} width={280} />
                         </View>
                       ) : (
                         <Text style={styles.noteBody}>{n.body}</Text>
@@ -204,7 +204,7 @@ export function VerseSheet() {
                       <Text style={styles.noteScope}>Sourate · {n.kind === 'canvas' ? 'dessin' : 'texte'}</Text>
                       {n.kind === 'canvas' ? (
                         <View style={styles.canvasWrap}>
-                          <CanvasView body={n.body} scale={0.7} />
+                          <CanvasView body={n.body} width={280} />
                         </View>
                       ) : (
                         <Text style={styles.noteBody}>{n.body}</Text>
