@@ -14,6 +14,7 @@ import {
   View,
 } from 'react-native';
 import { useHifzStore } from '@stores/hifz';
+import { useNotesStore } from '@stores/notes';
 import { useSessionStore } from '@stores/session';
 import { useUiStore } from '@stores/ui';
 import structure from '@content/structure.json';
@@ -52,6 +53,19 @@ export function VerseSheet() {
   const applyRange = useHifzStore((s) => s.applyRange);
   const undo = useHifzStore((s) => s.undo);
   const showToast = useUiStore((s) => s.showToast);
+  const allNotes = useNotesStore((s) => s.notes);
+
+  const verseNotes = useMemo(() => {
+    if (!openVerse) return [];
+    return allNotes.filter(
+      (n) => n.scope === 'ayah' && n.surah === openVerse.surah && n.ayah === openVerse.ayah,
+    );
+  }, [allNotes, openVerse]);
+
+  const surahNotes = useMemo(() => {
+    if (!openVerse) return [];
+    return allNotes.filter((n) => n.scope === 'surah' && n.surah === openVerse.surah);
+  }, [allNotes, openVerse]);
 
   const meta = openVerse ? META.find((m) => m.id === openVerse.surah) : undefined;
 
@@ -157,6 +171,28 @@ export function VerseSheet() {
                 <Text style={styles.translation}>{frenchText}</Text>
               </View>
             ) : null}
+
+            <View style={styles.notesSection}>
+              <Text style={styles.notesLabel}>Notes</Text>
+              {verseNotes.length === 0 && surahNotes.length === 0 ? (
+                <Text style={styles.notesEmpty}>Aucune note</Text>
+              ) : (
+                <>
+                  {verseNotes.map((n) => (
+                    <View key={n.id} style={styles.noteCard}>
+                      <Text style={styles.noteScope}>Verset</Text>
+                      <Text style={styles.noteBody}>{n.body}</Text>
+                    </View>
+                  ))}
+                  {surahNotes.map((n) => (
+                    <View key={n.id} style={styles.noteCard}>
+                      <Text style={styles.noteScope}>Sourate</Text>
+                      <Text style={styles.noteBody}>{n.body}</Text>
+                    </View>
+                  ))}
+                </>
+              )}
+            </View>
           </ScrollView>
         </Pressable>
       </Pressable>
@@ -272,6 +308,45 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter_400Regular',
     fontSize: 15,
     lineHeight: 22,
+    color: light.text,
+  },
+  notesSection: {
+    marginTop: 20,
+    gap: 8,
+  },
+  notesLabel: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 11,
+    color: light.textMuted,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: 4,
+  },
+  notesEmpty: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 13,
+    color: light.textMuted,
+    fontStyle: 'italic',
+  },
+  noteCard: {
+    padding: 12,
+    borderRadius: 8,
+    backgroundColor: '#F5EFE4',
+    borderLeftWidth: 3,
+    borderLeftColor: light.accentSecondary,
+  },
+  noteScope: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 10,
+    color: light.textMuted,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: 4,
+  },
+  noteBody: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 14,
+    lineHeight: 20,
     color: light.text,
   },
 });
