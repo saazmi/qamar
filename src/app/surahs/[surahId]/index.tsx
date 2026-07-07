@@ -6,7 +6,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
-import { NotebookPen, Pause, Play } from 'lucide-react-native';
+import { NotebookPen, Play, Square } from 'lucide-react-native';
 import { ensureAudioConfigured, playRange, stopPlayback } from '@audio/player';
 import { AyahBlock } from '@components/quran/AyahBlock';
 import { ContinuousPage } from '@components/quran/ContinuousPage';
@@ -51,6 +51,7 @@ export default function ReadingViewScreen() {
   const noteEditor = useSessionStore((s) => s.noteEditor);
   const openNoteEditor = useSessionStore((s) => s.openNoteEditor);
   const setPlayingAyah = useSessionStore((s) => s.setPlayingAyah);
+  const setReadingMode = useSessionStore((s) => s.setReadingMode);
   const playingAyah = useSessionStore((s) => s.playingAyah);
   const surahNoteCount = useNotesStore((s) =>
     s.notes.reduce((n, note) => (note.scope === 'surah' && note.surah === id ? n + 1 : n), 0),
@@ -59,9 +60,13 @@ export default function ReadingViewScreen() {
   const isPlayingSurah = playingAyah?.surah === id;
   const playbackHandleRef = useRef<{ stop: () => Promise<void> } | null>(null);
 
-  const startPlayback = async () => {
+  const startPlaybackFromAyah = async (startAyah: number) => {
+    // Play acts as an alternative mode — clear toolbar mode, kill any
+    // in-flight playback, then start fresh from the requested ayah.
+    setReadingMode('read');
+    await playbackHandleRef.current?.stop();
+    await stopPlayback();
     await ensureAudioConfigured();
-    const startAyah = isPlayingSurah && playingAyah ? playingAyah.ayah : 1;
     const handle = await playRange(
       id,
       startAyah,
@@ -71,20 +76,16 @@ export default function ReadingViewScreen() {
     playbackHandleRef.current = handle;
   };
 
-  // Pause: keep session.playingAyah set so the highlight remains and the
-  // next play resumes from there. Only natural end-of-surah clears it (via
-  // playRange's onAyahChange).
   const stopSurahPlayback = async () => {
     await playbackHandleRef.current?.stop();
     playbackHandleRef.current = null;
     await stopPlayback();
+    setPlayingAyah(null);
   };
 
   useEffect(
     () => () => {
-      // Unmount: clear highlight AND stop audio.
       void stopSurahPlayback();
-      setPlayingAyah(null);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
@@ -140,14 +141,14 @@ export default function ReadingViewScreen() {
         <Pressable
           onPress={() => {
             if (isPlayingSurah) void stopSurahPlayback();
-            else void startPlayback();
+            else void startPlaybackFromAyah(1);
           }}
           hitSlop={12}
           style={styles.playBtn}
-          accessibilityLabel="Lecture continue"
+          accessibilityLabel={isPlayingSurah ? 'Arrêter la lecture' : 'Lecture continue'}
         >
           {isPlayingSurah ? (
-            <Pause size={18} color={light.state.playingMarker} />
+            <Square size={18} color={light.state.playingMarker} fill={light.state.playingMarker} />
           ) : (
             <Play size={18} color={light.textMuted} />
           )}

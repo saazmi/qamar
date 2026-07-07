@@ -48,7 +48,7 @@ export const useSessionStore = create<SessionState>((set) => ({
   closeVerseSheet: () => set({ openVerse: null }),
 
   readingMode: 'read',
-  setReadingMode: (m) => set({ readingMode: m, rangeAnchor: null }),
+  setReadingMode: (m) => set({ readingMode: m, rangeAnchor: null, playingAyah: null }),
 
   rangeAnchor: null,
   setRangeAnchor: (v) => set({ rangeAnchor: v }),
