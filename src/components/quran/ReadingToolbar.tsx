@@ -12,8 +12,9 @@ interface ModeDef {
 }
 
 const MODES: readonly ModeDef[] = [
+  { key: 'details', label: 'Détails', glyph: 'ⓘ' },
   { key: 'mark', label: 'Marquer', glyph: '●' },
-  { key: 'range', label: 'Plage', glyph: '⇥' },
+  { key: 'range', label: 'Sélection', glyph: '⇥' },
   { key: 'notes', label: 'Notes', glyph: '✎' },
   { key: 'listen', label: 'Écouter', glyph: '▶' },
 ];
@@ -24,11 +25,12 @@ export function ReadingToolbar() {
   const rangeAnchor = useSessionStore((s) => s.rangeAnchor);
 
   const instruction = (() => {
+    if (mode === 'details') return 'Touchez un verset pour voir ses détails.';
     if (mode === 'mark') return 'Touchez un verset pour cycler son état.';
     if (mode === 'range')
       return rangeAnchor
         ? `Ancre: ${rangeAnchor.surah}:${rangeAnchor.ayah} — touchez la fin.`
-        : 'Touchez le premier verset de la plage.';
+        : 'Touchez le premier verset de la sélection.';
     if (mode === 'notes') return 'Touchez un verset pour ouvrir sa note.';
     if (mode === 'listen') return 'Touchez un verset pour l\'écouter.';
     return null;

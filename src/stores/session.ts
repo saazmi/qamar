@@ -5,7 +5,7 @@
 
 import { create } from 'zustand';
 
-export type ReadingMode = 'read' | 'mark' | 'range' | 'notes' | 'listen';
+export type ReadingMode = 'read' | 'details' | 'mark' | 'range' | 'notes' | 'listen';
 
 interface OpenVerse {
   surah: number;

@@ -67,8 +67,12 @@ export function useAyahTapHandler() {
         return;
       }
 
-      // Default 'read' mode: open the verse sheet.
-      openVerseSheet(surah, ayah);
+      if (mode === 'details') {
+        openVerseSheet(surah, ayah);
+        return;
+      }
+
+      // Default 'read' mode: taps do nothing — pure reading.
     },
     [
       mode,
