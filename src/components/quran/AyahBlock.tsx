@@ -109,8 +109,10 @@ const styles = StyleSheet.create({
     color: light.text,
   },
   marker: {
-    color: light.textMuted,
+    // Mushaf tradition: ayah markers illuminated in gold.
+    color: light.accentSecondary,
     fontSize: 20,
+    fontFamily: 'Inter_700Bold',
   },
   badge: {
     marginTop: 8,

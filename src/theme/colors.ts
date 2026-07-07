@@ -14,6 +14,7 @@ export const light = {
   accentSecondary: '#B7891A', // deeper gold — meets AA contrast against parchment
   state: {
     learningBg: '#F3D488', // shifted amber — visible against parchment
+    learningMarker: '#8B6914', // deep amber for the ayah number
     memorizedBg: '#CDE4D3', // cooler mint so green vs gold reads clearly
     memorizedLine: '#2D6A4F',
     needsReview: '#8FB39D',
@@ -38,6 +39,7 @@ export const dark = {
   accentSecondary: '#D9B84A',
   state: {
     learningBg: '#4A3A1F',
+    learningMarker: '#D9B84A',
     memorizedBg: '#22362C',
     memorizedLine: '#5FA383',
     needsReview: '#4E7A63',

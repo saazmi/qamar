@@ -43,8 +43,9 @@ function markerColorFor(state: AyahState, playing: boolean): string {
   if (playing) return light.state.playingMarker;
   if (state === 'memorized') return light.accent;
   if (state === 'needsReview') return light.state.needsReview;
-  if (state === 'learning') return '#8B6914';
-  return light.textMuted;
+  if (state === 'learning') return light.state.learningMarker;
+  // Mushaf tradition: ayah markers illuminated in gold.
+  return light.accentSecondary;
 }
 
 const NO_SELECT = {
