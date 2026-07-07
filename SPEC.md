@@ -1,4 +1,4 @@
-# SPEC.md — Quran Memorization App for ADHD Learners (codename: **Rusookh**)
+# SPEC.md — Quran Memorization App for ADHD Learners (**Qamar**)
 
 > **Purpose of this document**
 > This is the master specification for a Quran memorization (hifz) app designed for people with ADHD. It is the single source of truth for *what* we are building, *why*, and *how it must behave*. It is written to be handed to Claude Code (or any sufficiently capable engineering agent) so the agent can build the project autonomously without further architectural clarification.
@@ -44,7 +44,7 @@
 
 ## 1. Project Identity
 
-**Codename**: Rusookh (رُسُوخ — "firm rootedness," as in knowledge firmly anchored in the heart). The name is a placeholder; as with Iqraa, the display name must live only in `app.json` and a single i18n string. No hardcoded name anywhere in code.
+**Name**: **Qamar** (قمر — "the moon"). As with Iqraa, the display name lives only in `app.json` and a single i18n string. No hardcoded name anywhere in code.
 
 **One-sentence definition**: An offline-first mobile app that helps people with ADHD memorize the Quran by making progress visible, sessions short, states simple, and revision automatic.
 
@@ -263,7 +263,7 @@ Iqraa's rejection table applies (Flutter, native dual codebases, Capacitor, Redu
 ## 7. Project Structure
 
 ```
-rusookh/
+qamar/
 ├── README.md
 ├── SPEC.md                            # This document, at repo root
 ├── LICENSE                            # MIT
@@ -376,7 +376,7 @@ SurahMeta {
 ### 8.2 Arabic text (bundled)
 
 - **Riwayah**: Hafs ʿan ʿĀṣim.
-- **Script**: **Imlaei (plain orthography) with full harakat** as the v1 default — this is the "normal writing, all harakat, beginner friendly" requirement. Uthmani text is *also* bundled if size permits (each is ~2–3 MB of JSON) and exposed as a settings toggle; if only one ships in v1, it is Imlaei.
+- **Script**: **Imlaei (plain orthography) with full harakat**, single edition — the "normal writing, all harakat, beginner friendly" requirement. Uthmani is **not** bundled in v1 (owner decision D2, 2026-07-07); reintroducing it later is a content-pipeline change only, no architectural impact.
 - **Primary source**: Tanzil.net text distributions (Imlaei "simple" and Uthmani editions, both with full diacritics). Fallback: fawazahmed0/quran-api static dumps or the Quran Foundation (Quran.com) API used **only at build time** by the content pipeline. The app never fetches text at runtime.
 - Per-surah file shape:
 
@@ -393,7 +393,7 @@ AyahText {
 
 - **Requirement source**: "if possible the colored letters with tajwid."
 - **Approach**: use a pre-annotated tajweed dataset (e.g., the Tanzil-derived tajweed-annotated text used by several open-source projects, or Quran.com's tajweed script data), converted at build time into per-ayah `segments` where each segment optionally carries a rule id (`ghunnah`, `idgham`, `ikhfa`, `qalqalah`, `madd_*`, …). Rendering = colored `<Text>` spans per segment; no font tricks, no images.
-- **Spike (timeboxed, 2 days, during Phase 1)**: verify that (a) a redistributable annotated dataset exists for the chosen text edition, (b) segment boundaries align with the bundled Imlaei/Uthmani text, (c) colored spans render acceptably in the chosen font on Android. If any check fails → tajweed moves to the v1.1+ backlog and v1 ships plain black text with harakat. **The reading view must be built so that tajweed is purely additive** (a render mode on `AyahBlock`), never a structural dependency.
+- **Spike (timeboxed, 2 days, during Phase 1)**: verify that (a) a redistributable annotated dataset exists for the Imlaei edition, (b) segment boundaries align with the bundled Imlaei text, (c) colored spans render acceptably in the chosen font on Android. If any check fails → tajweed moves to the v1.1+ backlog and v1 ships plain black text with harakat. **The reading view must be built so that tajweed is purely additive** (a render mode on `AyahBlock`), never a structural dependency.
 - Tajweed colors follow the conventional scheme (green ghunnah, red madd, etc.) defined as theme tokens `colors.tajweed.*`, with a legend screen in Settings.
 
 ### 8.4 French translation (bundled)
@@ -493,7 +493,7 @@ The GitHub-contribution-graph moment. One cell per ayah, numbered, RTL-ordered. 
 
 ### 10.6 Settings
 
-Theme (light/dark/system), Arabic script (Imlaei/Uthmani if both bundled), Arabic font size slider, translation on/off default, tajweed coloring toggle + legend (v1.1), qari selection (v1 has one; UI is a picker anyway), daily review budget, optional single daily reminder (time picker; plain neutral copy: "Ta session hifz t'attend" — no guilt variants), reduce motion, audio downloads manager (§12.4), export/import backup (§19.4), About/licenses.
+Theme (light/dark/system), Arabic font size slider, translation on/off default, tajweed coloring toggle + legend (v1.1), qari selection (v1 has one; UI is a picker anyway), daily review budget, optional single daily reminder (time picker; plain neutral copy: "Ta session hifz t'attend" — no guilt variants), reduce motion, audio downloads manager (§12.4), export/import backup (§19.4), About/licenses.
 
 ---
 
@@ -850,12 +850,12 @@ Docs, screenshots, store listings, TestFlight/Play internal → production, GitH
 
 The agent must not resolve these silently; open a GitHub issue for each at project start.
 
-- **D1 — App name**: "Rusookh" is a codename. Decide before store submission; architecture already makes rename trivial.
-- **D2 — Script default**: spec says Imlaei default with Uthmani as toggle (both bundled if size allows). Confirm after the Phase 1 font spike.
-- **D3 — Qari**: Al-Husary (murattal) proposed as the single v1 qari. Confirm, and confirm the audio host's redistribution terms.
-- **D4 — French translation edition**: Hamidullah proposed. Confirm edition + license text.
+- **D1 — App name**: **Resolved — Qamar** (2026-07-07).
+- **D2 — Script default**: **Resolved — Imlaei only** (2026-07-07). Uthmani not bundled in v1.
+- **D3 — Qari**: **Deferred** (owner note 2026-07-07): licensing concern flagged. Al-Husary via EveryAyah is the SPEC placeholder pending verification; owner will investigate CC-licensed / open-source qari options before v1 ships audio. Architecture (`QariSource` interface, §12.2) already makes the swap config-only. Until resolved, treat audio features as "must not block ship if source unavailable" — v1 may ship text-only if needed.
+- **D4 — French translation edition**: **Resolved — Muhammad Hamidullah** (2026-07-07), via Tanzil redistribution. Exact edition + license text captured during Phase 1 content-pipeline run.
 - **D5 — Tajweed in v1.1**: proceed only if Spike B passes; owner reviews the spike report.
-- **D6 — Daily reminder default**: spec says opt-in (off by default). Confirm this against the ADHD doctrine vs. discoverability trade-off.
+- **D6 — Daily reminder default**: **Resolved — opt-in, off by default** (2026-07-07). Matches §15.4 and §15.8; discoverability handled via a one-time hint in Settings on first Today-screen visit.
 
 ---
 

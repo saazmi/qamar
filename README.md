@@ -2,7 +2,7 @@
 
 > Offline-first Quran memorization (hifz) app designed for ADHD learners.
 
-**Codename in SPEC**: Rusookh. **Display name**: **Qamar** (قمر). The display name lives only in `app.json` and a single i18n string per SPEC §1.
+**Name**: **Qamar** (قمر — "the moon"). Lives only in `app.json` and a single i18n string per SPEC §1.
 
 ## What this is
 

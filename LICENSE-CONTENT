@@ -17,26 +17,20 @@ License:      TBD (Tanzil non-commercial + attribution terms)
 URL:          TBD
 Retrieved:    TBD
 
+Status: single Arabic edition in v1 (owner decision D2, 2026-07-07).
+        Uthmani not bundled in v1.
+
 --------------------------------------------------------------------------
-2. Quran Arabic Text (Uthmani, Hafs `an `Asim) — optional
+2. French Translation — Muhammad Hamidullah
 --------------------------------------------------------------------------
-Source:       TBD (candidate: Tanzil.net Uthmani)
-Edition:      TBD
+Source:       Tanzil translations collection (owner decision D4, 2026-07-07)
+Edition:      TBD (record during Phase 1 pipeline run)
 License:      TBD
-URL:          TBD
+URL:          https://tanzil.net/trans/  (verify current edition & terms)
 Retrieved:    TBD
 
 --------------------------------------------------------------------------
-3. French Translation
---------------------------------------------------------------------------
-Source:       TBD (candidate: Muhammad Hamidullah via Tanzil translations)
-Edition:      TBD
-License:      TBD
-URL:          TBD
-Retrieved:    TBD
-
---------------------------------------------------------------------------
-4. Tajweed Annotations (v1.1, spike-gated — SPEC §8.3)
+3. Tajweed Annotations (v1.1, spike-gated — SPEC §8.3, D5)
 --------------------------------------------------------------------------
 Source:       TBD
 Edition:      TBD
@@ -45,16 +39,27 @@ URL:          TBD
 Retrieved:    TBD
 
 --------------------------------------------------------------------------
-5. Audio — Qari Recitation
+4. Audio — Qari Recitation
 --------------------------------------------------------------------------
-Qari:         TBD (candidate: Mahmoud Khalil Al-Husary, murattal)
-Host:         TBD (candidate: EveryAyah.com or Quran Foundation CDN)
+Status:       DEFERRED (owner note D3, 2026-07-07) — licensing concern.
+              Al-Husary via EveryAyah is the SPEC placeholder; owner is
+              investigating CC-licensed / open-source qari options before
+              v1 ships audio. v1 may ship text-only if no compliant source
+              is available. QariSource interface (src/audio/sources.ts)
+              already isolates the swap.
+Qari:         TBD
+Host:         TBD
 Terms:        TBD (redistribution / hotlinking permissions)
 URL:          TBD
 Retrieved:    TBD
 
+Candidate open-source / permissively-licensed avenues to explore:
+- Quran Foundation (Quran.com) audio API — negotiated terms with reciters
+- Volunteer / community recordings released under CC0 or CC-BY
+- Tarteel-hosted recitations (verify per-reciter terms)
+
 --------------------------------------------------------------------------
-6. Fonts
+5. Fonts
 --------------------------------------------------------------------------
 Arabic primary:   Noto Naskh Arabic — SIL Open Font License 1.1
                   https://fonts.google.com/noto/specimen/Noto+Naskh+Arabic
