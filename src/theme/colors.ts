@@ -15,11 +15,11 @@ export const light = {
   state: {
     learningBg: '#F3D488', // shifted amber — visible against parchment
     learningMarker: '#8B6914', // deep amber for the ayah number
-    memorizedBg: '#CDE4D3', // cooler mint so green vs gold reads clearly
+    memorizedBg: '#C1D5A8', // soft sage-olive — warmer than mint, pairs with gold
     memorizedLine: '#2D6A4F',
     needsReview: '#8FB39D',
-    playingBg: '#D6DEEF',
-    playingMarker: '#B0432E', // mushaf vermillion — sits outside the blue wash for contrast
+    playingBg: '#E8CAC0', // dusty peach — analogous to the parchment + vermillion marker
+    playingMarker: '#B0432E', // mushaf vermillion
   },
   error: '#B03A48',
   // v1.1 — SPEC §8.3
@@ -40,10 +40,10 @@ export const dark = {
   state: {
     learningBg: '#4A3A1F',
     learningMarker: '#D9B84A',
-    memorizedBg: '#22362C',
+    memorizedBg: '#2E3A25',
     memorizedLine: '#5FA383',
     needsReview: '#4E7A63',
-    playingBg: '#2A3245',
+    playingBg: '#3E2C26',
     playingMarker: '#D96D57',
   },
   error: '#D77687',
