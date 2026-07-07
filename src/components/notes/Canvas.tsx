@@ -6,7 +6,14 @@
 //   points are integers in a fixed CANVAS_W × CANVAS_H coordinate space.
 
 import { forwardRef, useImperativeHandle, useMemo, useRef, useState } from 'react';
-import { PanResponder, Pressable, StyleSheet, Text, View } from 'react-native';
+import {
+  PanResponder,
+  Pressable,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 import Svg, { Polyline } from 'react-native-svg';
 import { light } from '@theme/colors';
 
@@ -56,14 +63,20 @@ export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas(
   },
   ref,
 ) {
+  const { height: winH } = useWindowDimensions();
+  const maxDisplayH = winH * 0.6; // never taller than 60% of the viewport
   const [strokes, setStrokes] = useState<CanvasStroke[]>(initialStrokes);
-  const [displayW, setDisplayW] = useState(0);
+  const [containerW, setContainerW] = useState(0);
   const currentRef = useRef<CanvasStroke | null>(null);
   const scaleRef = useRef(1);
   const [tick, setTick] = useState(0);
 
+  // Fit-inside: natural height = containerW * aspectRatio. If that exceeds
+  // maxDisplayH, shrink width so the ratio is preserved.
+  const naturalH = containerW * aspectRatio;
+  const displayH = Math.min(naturalH, maxDisplayH);
+  const displayW = displayH === naturalH ? containerW : displayH / aspectRatio;
   scaleRef.current = displayW > 0 ? CANVAS_INTERNAL_W / displayW : 1;
-  const displayH = displayW * aspectRatio;
 
   const responder = useMemo(
     () =>
@@ -133,17 +146,20 @@ export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas(
         </Pressable>
       </View>
       <View
-        {...responder.panHandlers}
-        onLayout={(e) => setDisplayW(e.nativeEvent.layout.width)}
-        style={[styles.canvas, { height: displayH || 300 }]}
-        collapsable={false}
+        onLayout={(e) => setContainerW(e.nativeEvent.layout.width)}
+        style={styles.centerRow}
       >
-        {displayW > 0 && (
-          <Svg
-            width={displayW}
-            height={displayH}
-            viewBox={`0 0 ${CANVAS_INTERNAL_W} ${CANVAS_INTERNAL_H}`}
-          >
+        <View
+          {...responder.panHandlers}
+          style={[styles.canvas, { width: displayW, height: displayH }]}
+          collapsable={false}
+        >
+          {displayW > 0 && (
+            <Svg
+              width={displayW}
+              height={displayH}
+              viewBox={`0 0 ${CANVAS_INTERNAL_W} ${CANVAS_INTERNAL_H}`}
+            >
             {strokes.map((s, i) => (
               <Polyline
                 key={i}
@@ -155,19 +171,20 @@ export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas(
                 strokeLinejoin="round"
               />
             ))}
-            {preview && preview.p.length > 0 && (
-              <Polyline
-                key={`preview-${tick}`}
-                points={preview.p.map(([x, y]) => `${x},${y}`).join(' ')}
-                stroke={preview.c}
-                strokeWidth={preview.w}
-                fill="none"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            )}
-          </Svg>
-        )}
+              {preview && preview.p.length > 0 && (
+                <Polyline
+                  key={`preview-${tick}`}
+                  points={preview.p.map(([x, y]) => `${x},${y}`).join(' ')}
+                  stroke={preview.c}
+                  strokeWidth={preview.w}
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              )}
+            </Svg>
+          )}
+        </View>
       </View>
     </View>
   );
@@ -214,8 +231,11 @@ const styles = StyleSheet.create({
   wrap: {
     width: '100%',
   },
-  canvas: {
+  centerRow: {
     width: '100%',
+    alignItems: 'center',
+  },
+  canvas: {
     backgroundColor: '#FFFFFF',
     borderRadius: 8,
     borderWidth: 1,
