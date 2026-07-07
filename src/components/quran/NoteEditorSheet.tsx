@@ -1,8 +1,7 @@
 // Verse-scoped note editor. Opens when Notes mode + tap on an ayah.
-// Lists existing notes for that verse; each note is editable inline;
-// delete = undo-toast (no modal confirm — SPEC §15.3).
+// Supports two note kinds — text and canvas (mutually exclusive per note).
 
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import {
   KeyboardAvoidingView,
   Modal,
@@ -14,10 +13,11 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { Canvas, CanvasView, type CanvasHandle } from '@components/notes/Canvas';
 import structure from '@content/structure.json';
 import { loadSurah } from '@content/text';
 import type { AyahText, SurahMeta } from '@content/types';
-import { useNotesStore, type Note } from '@stores/notes';
+import { useNotesStore, type Note, type NoteKind } from '@stores/notes';
 import { useSessionStore } from '@stores/session';
 import { useUiStore } from '@stores/ui';
 import { light } from '@theme/colors';
@@ -34,9 +34,13 @@ export function NoteEditorSheet() {
   const removeNote = useNotesStore((s) => s.removeNote);
   const showToast = useUiStore((s) => s.showToast);
 
-  const [draft, setDraft] = useState('');
+  const [draftKind, setDraftKind] = useState<NoteKind>('text');
+  const [draftText, setDraftText] = useState('');
+  const canvasRef = useRef<CanvasHandle | null>(null);
+
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingBody, setEditingBody] = useState('');
+  const editCanvasRef = useRef<CanvasHandle | null>(null);
 
   const meta = target ? META.find((m) => m.id === target.surah) : undefined;
   const arabicText = useMemo(() => {
@@ -55,29 +59,47 @@ export function NoteEditorSheet() {
   if (!target || !meta) return null;
 
   const handleAdd = () => {
-    const body = draft.trim();
-    if (!body) return;
-    addNote({ scope: 'ayah', surah: target.surah, ayah: target.ayah, body });
-    setDraft('');
+    if (draftKind === 'text') {
+      const body = draftText.trim();
+      if (!body) return;
+      addNote({ scope: 'ayah', kind: 'text', surah: target.surah, ayah: target.ayah, body });
+      setDraftText('');
+    } else {
+      const c = canvasRef.current;
+      if (!c || c.isEmpty()) return;
+      const body = c.serialize();
+      addNote({ scope: 'ayah', kind: 'canvas', surah: target.surah, ayah: target.ayah, body });
+      c.clear();
+    }
   };
 
-  const handleUpdate = (id: string) => {
-    const body = editingBody.trim();
-    if (!body) return;
-    updateNote(id, body);
+  const handleUpdate = (note: Note) => {
+    if (note.kind === 'text') {
+      const body = editingBody.trim();
+      if (!body) return;
+      updateNote(note.id, body);
+    } else {
+      const c = editCanvasRef.current;
+      if (!c) return;
+      updateNote(note.id, c.serialize());
+    }
     setEditingId(null);
     setEditingBody('');
   };
 
   const handleDelete = (note: Note) => {
     removeNote(note.id);
-    const preview = note.body.slice(0, 40) + (note.body.length > 40 ? '…' : '');
+    const preview =
+      note.kind === 'text'
+        ? note.body.slice(0, 40) + (note.body.length > 40 ? '…' : '')
+        : 'dessin';
     showToast({
       message: `Note supprimée · ${preview}`,
       actionLabel: 'Annuler',
       onAction: () => {
         addNote({
           scope: 'ayah',
+          kind: note.kind,
           surah: note.surah,
           ayah: note.ayah,
           body: note.body,
@@ -127,29 +149,54 @@ export function NoteEditorSheet() {
               ) : (
                 verseNotes.map((n) => (
                   <View key={n.id} style={styles.noteCard}>
+                    <View style={styles.noteHeader}>
+                      <Text style={styles.noteKindPill}>
+                        {n.kind === 'canvas' ? '✎ Dessin' : 'T Texte'}
+                      </Text>
+                    </View>
                     {editingId === n.id ? (
-                      <>
-                        <TextInput
-                          value={editingBody}
-                          onChangeText={setEditingBody}
-                          multiline
-                          maxLength={MAX_BODY}
-                          style={styles.input}
-                          placeholder="Modifier la note…"
-                          placeholderTextColor={light.textMuted}
-                        />
-                        <View style={styles.actionsRow}>
-                          <Pressable onPress={() => setEditingId(null)} hitSlop={8}>
-                            <Text style={styles.actionMuted}>Annuler</Text>
-                          </Pressable>
-                          <Pressable onPress={() => handleUpdate(n.id)} hitSlop={8}>
-                            <Text style={styles.action}>Enregistrer</Text>
-                          </Pressable>
-                        </View>
-                      </>
+                      n.kind === 'text' ? (
+                        <>
+                          <TextInput
+                            value={editingBody}
+                            onChangeText={setEditingBody}
+                            multiline
+                            maxLength={MAX_BODY}
+                            style={styles.input}
+                            placeholder="Modifier la note…"
+                            placeholderTextColor={light.textMuted}
+                          />
+                          <View style={styles.actionsRow}>
+                            <Pressable onPress={() => setEditingId(null)} hitSlop={8}>
+                              <Text style={styles.actionMuted}>Annuler</Text>
+                            </Pressable>
+                            <Pressable onPress={() => handleUpdate(n)} hitSlop={8}>
+                              <Text style={styles.action}>Enregistrer</Text>
+                            </Pressable>
+                          </View>
+                        </>
+                      ) : (
+                        <>
+                          <Canvas ref={editCanvasRef} initialStrokes={parseSafe(n.body)} />
+                          <View style={styles.actionsRow}>
+                            <Pressable onPress={() => setEditingId(null)} hitSlop={8}>
+                              <Text style={styles.actionMuted}>Annuler</Text>
+                            </Pressable>
+                            <Pressable onPress={() => handleUpdate(n)} hitSlop={8}>
+                              <Text style={styles.action}>Enregistrer</Text>
+                            </Pressable>
+                          </View>
+                        </>
+                      )
                     ) : (
                       <>
-                        <Text style={styles.noteBody}>{n.body}</Text>
+                        {n.kind === 'text' ? (
+                          <Text style={styles.noteBody}>{n.body}</Text>
+                        ) : (
+                          <View style={styles.canvasViewWrap}>
+                            <CanvasView body={n.body} />
+                          </View>
+                        )}
                         <View style={styles.actionsRow}>
                           <Pressable onPress={() => handleDelete(n)} hitSlop={8}>
                             <Text style={styles.actionMuted}>Supprimer</Text>
@@ -165,25 +212,47 @@ export function NoteEditorSheet() {
               )}
 
               <Text style={styles.sectionLabel}>Nouvelle note</Text>
-              <TextInput
-                value={draft}
-                onChangeText={setDraft}
-                multiline
-                maxLength={MAX_BODY}
-                placeholder="Écrivez une note…"
-                placeholderTextColor={light.textMuted}
-                style={styles.input}
-              />
-              <Pressable
-                onPress={handleAdd}
-                disabled={!draft.trim()}
-                style={[styles.addBtn, !draft.trim() && styles.addBtnDisabled]}
-              >
-                <Text
-                  style={[styles.addLabel, !draft.trim() && styles.addLabelDisabled]}
+              <View style={styles.kindToggle}>
+                <Pressable
+                  onPress={() => setDraftKind('text')}
+                  style={[styles.kindBtn, draftKind === 'text' && styles.kindBtnActive]}
                 >
-                  Ajouter
-                </Text>
+                  <Text style={[styles.kindLabel, draftKind === 'text' && styles.kindLabelActive]}>
+                    T
+                  </Text>
+                  <Text style={[styles.kindSub, draftKind === 'text' && styles.kindSubActive]}>
+                    Texte
+                  </Text>
+                </Pressable>
+                <Pressable
+                  onPress={() => setDraftKind('canvas')}
+                  style={[styles.kindBtn, draftKind === 'canvas' && styles.kindBtnActive]}
+                >
+                  <Text style={[styles.kindLabel, draftKind === 'canvas' && styles.kindLabelActive]}>
+                    ✎
+                  </Text>
+                  <Text style={[styles.kindSub, draftKind === 'canvas' && styles.kindSubActive]}>
+                    Dessin
+                  </Text>
+                </Pressable>
+              </View>
+
+              {draftKind === 'text' ? (
+                <TextInput
+                  value={draftText}
+                  onChangeText={setDraftText}
+                  multiline
+                  maxLength={MAX_BODY}
+                  placeholder="Écrivez une note…"
+                  placeholderTextColor={light.textMuted}
+                  style={styles.input}
+                />
+              ) : (
+                <Canvas ref={canvasRef} />
+              )}
+
+              <Pressable onPress={handleAdd} style={styles.addBtn}>
+                <Text style={styles.addLabel}>Ajouter</Text>
               </Pressable>
             </ScrollView>
           </Pressable>
@@ -191,6 +260,15 @@ export function NoteEditorSheet() {
       </Pressable>
     </Modal>
   );
+}
+
+function parseSafe(body: string): [] {
+  try {
+    const v = JSON.parse(body);
+    return Array.isArray(v) ? (v as []) : [];
+  } catch {
+    return [];
+  }
 }
 
 const styles = StyleSheet.create({
@@ -206,7 +284,7 @@ const styles = StyleSheet.create({
     backgroundColor: light.surface,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    maxHeight: '90%',
+    maxHeight: '92%',
   },
   grabber: {
     width: 36,
@@ -267,11 +345,33 @@ const styles = StyleSheet.create({
     borderLeftColor: light.accentSecondary,
     marginBottom: 8,
   },
+  noteHeader: {
+    marginBottom: 6,
+  },
+  noteKindPill: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 4,
+    backgroundColor: '#FFFFFF',
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 10,
+    color: light.textMuted,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    overflow: 'hidden',
+  },
   noteBody: {
     fontFamily: 'Inter_400Regular',
     fontSize: 14,
     lineHeight: 20,
     color: light.text,
+  },
+  canvasViewWrap: {
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 8,
+    padding: 8,
   },
   input: {
     borderWidth: 1,
@@ -285,6 +385,40 @@ const styles = StyleSheet.create({
     color: light.text,
     backgroundColor: '#FFFFFF',
     textAlignVertical: 'top' as const,
+  },
+  kindToggle: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 12,
+  },
+  kindBtn: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    backgroundColor: '#F5EFE4',
+  },
+  kindBtnActive: {
+    backgroundColor: light.accent,
+  },
+  kindLabel: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 18,
+    color: light.textMuted,
+  },
+  kindLabelActive: {
+    color: '#FFFFFF',
+  },
+  kindSub: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 10,
+    color: light.textMuted,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginTop: 2,
+  },
+  kindSubActive: {
+    color: '#FFFFFF',
   },
   actionsRow: {
     flexDirection: 'row',
@@ -303,21 +437,15 @@ const styles = StyleSheet.create({
     color: light.textMuted,
   },
   addBtn: {
-    marginTop: 8,
+    marginTop: 12,
     paddingVertical: 14,
     borderRadius: 10,
     backgroundColor: light.accent,
     alignItems: 'center',
   },
-  addBtnDisabled: {
-    backgroundColor: '#DED7CB',
-  },
   addLabel: {
     fontFamily: 'Inter_600SemiBold',
     fontSize: 14,
     color: '#FFFFFF',
-  },
-  addLabelDisabled: {
-    color: light.textMuted,
   },
 });

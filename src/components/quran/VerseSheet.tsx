@@ -13,6 +13,7 @@ import {
   Text,
   View,
 } from 'react-native';
+import { CanvasView } from '@components/notes/Canvas';
 import { useHifzStore } from '@stores/hifz';
 import { useNotesStore } from '@stores/notes';
 import { useSessionStore } from '@stores/session';
@@ -188,14 +189,26 @@ export function VerseSheet() {
                 <>
                   {verseNotes.map((n) => (
                     <View key={n.id} style={styles.noteCard}>
-                      <Text style={styles.noteScope}>Verset</Text>
-                      <Text style={styles.noteBody}>{n.body}</Text>
+                      <Text style={styles.noteScope}>Verset · {n.kind === 'canvas' ? 'dessin' : 'texte'}</Text>
+                      {n.kind === 'canvas' ? (
+                        <View style={styles.canvasWrap}>
+                          <CanvasView body={n.body} scale={0.7} />
+                        </View>
+                      ) : (
+                        <Text style={styles.noteBody}>{n.body}</Text>
+                      )}
                     </View>
                   ))}
                   {surahNotes.map((n) => (
                     <View key={n.id} style={styles.noteCard}>
-                      <Text style={styles.noteScope}>Sourate</Text>
-                      <Text style={styles.noteBody}>{n.body}</Text>
+                      <Text style={styles.noteScope}>Sourate · {n.kind === 'canvas' ? 'dessin' : 'texte'}</Text>
+                      {n.kind === 'canvas' ? (
+                        <View style={styles.canvasWrap}>
+                          <CanvasView body={n.body} scale={0.7} />
+                        </View>
+                      ) : (
+                        <Text style={styles.noteBody}>{n.body}</Text>
+                      )}
                     </View>
                   ))}
                 </>
@@ -376,5 +389,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 20,
     color: light.text,
+  },
+  canvasWrap: {
+    alignItems: 'center',
+    marginTop: 4,
   },
 });

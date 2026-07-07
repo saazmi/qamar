@@ -6,10 +6,15 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
 export type NoteScope = 'ayah' | 'surah';
+export type NoteKind = 'text' | 'canvas';
 
+// Body encoding per kind:
+//   text:   the raw text
+//   canvas: JSON.stringify(CanvasStroke[]) — see components/notes/Canvas.
 export interface Note {
   id: string;
   scope: NoteScope;
+  kind: NoteKind;
   surah: number;
   ayah?: number;
   body: string;
@@ -19,7 +24,13 @@ export interface Note {
 
 interface NotesState {
   notes: Note[];
-  addNote: (input: { scope: NoteScope; surah: number; ayah?: number; body: string }) => Note;
+  addNote: (input: {
+    scope: NoteScope;
+    kind: NoteKind;
+    surah: number;
+    ayah?: number;
+    body: string;
+  }) => Note;
   updateNote: (id: string, body: string) => void;
   removeNote: (id: string) => void;
   notesForVerse: (surah: number, ayah: number) => Note[];
@@ -36,11 +47,12 @@ export const useNotesStore = create<NotesState>()(
     (set, get) => ({
       notes: [],
 
-      addNote: ({ scope, surah, ayah, body }) => {
+      addNote: ({ scope, kind, surah, ayah, body }) => {
         const now = nowIso();
         const note: Note = {
           id: newId(),
           scope,
+          kind,
           surah,
           ayah: scope === 'ayah' ? ayah : undefined,
           body,
@@ -74,6 +86,11 @@ export const useNotesStore = create<NotesState>()(
     {
       name: 'qamar.notes.v1',
       storage: createJSONStorage(() => AsyncStorage),
+      // Migrate legacy notes (no `kind` field) to text.
+      onRehydrateStorage: () => (state) => {
+        if (!state) return;
+        state.notes = state.notes.map((n) => ({ ...n, kind: n.kind ?? 'text' }));
+      },
     },
   ),
 );
