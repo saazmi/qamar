@@ -73,7 +73,12 @@ let sequenceGen = 0;
 // basmalah plays.
 const BASMALAH_SURAH = 1;
 const BASMALAH_AYAH = 1;
-function needsBasmalahPrefix(surah: number, fromAyah: number): boolean {
+function needsBasmalahPrefix(
+  surah: number,
+  fromAyah: number,
+  includeBasmalah: boolean,
+): boolean {
+  if (!includeBasmalah) return false;
   if (fromAyah !== 1) return false;
   if (surah === 1) return false; // Al-Fatiha
   if (surah === 9) return false; // At-Tawba
@@ -88,7 +93,7 @@ export async function playRange(
   fromAyah: number,
   toAyah: number,
   onAyahChange: (v: { surah: number; ayah: number } | null) => void,
-  opts: { rate?: number } = {},
+  opts: { rate?: number; includeBasmalah?: boolean } = {},
 ): Promise<{ stop: () => Promise<void> }> {
   const gen = ++sequenceGen;
 
@@ -107,7 +112,7 @@ export async function playRange(
     });
   };
 
-  if (needsBasmalahPrefix(surah, fromAyah)) {
+  if (needsBasmalahPrefix(surah, fromAyah, opts.includeBasmalah ?? false)) {
     // Highlight ayah 1 of the target surah while the basmalah plays.
     onAyahChange({ surah, ayah: 1 });
     await playAyah(BASMALAH_SURAH, BASMALAH_AYAH, {

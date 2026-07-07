@@ -72,6 +72,7 @@ export default function ReadingViewScreen() {
       startAyah,
       surahMeta?.ayahCount ?? 1,
       setPlayingAyah,
+      { includeBasmalah: true },
     );
     playbackHandleRef.current = handle;
   };

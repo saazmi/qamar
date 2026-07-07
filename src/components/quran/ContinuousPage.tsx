@@ -99,14 +99,19 @@ export const ContinuousPage = memo(function ContinuousPage({
           const bg = backgroundFor(state, playing);
           const markerColor = markerColorFor(state, playing);
           return (
-            <Text
-              key={a.ayah}
-              onPress={() => onTap(surah, a.ayah)}
-              selectable={false}
-              style={[NO_SELECT, bg ? { backgroundColor: bg } : null] as any}
-            >
-              {a.text}
-              <Text style={[styles.marker, { color: markerColor }]}>
+            <Text key={a.ayah}>
+              <Text
+                onPress={() => onTap(surah, a.ayah)}
+                selectable={false}
+                style={[NO_SELECT, bg ? { backgroundColor: bg } : null] as any}
+              >
+                {a.text}
+              </Text>
+              <Text
+                onPress={() => onTap(surah, a.ayah)}
+                selectable={false}
+                style={[styles.marker, NO_SELECT, { color: markerColor }] as any}
+              >
                 {' '}
                 {noteSet.has(a.ayah) ? (
                   <Text style={styles.noteGlyph}>✎ </Text>

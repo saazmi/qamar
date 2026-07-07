@@ -19,7 +19,7 @@ export const light = {
     memorizedLine: '#2D6A4F',
     needsReview: '#8FB39D',
     playingBg: '#D6DEEF',
-    playingMarker: '#4C6FA5',
+    playingMarker: '#B0432E', // mushaf vermillion — sits outside the blue wash for contrast
   },
   error: '#B03A48',
   // v1.1 — SPEC §8.3
@@ -44,7 +44,7 @@ export const dark = {
     memorizedLine: '#5FA383',
     needsReview: '#4E7A63',
     playingBg: '#2A3245',
-    playingMarker: '#7B99C9',
+    playingMarker: '#D96D57',
   },
   error: '#D77687',
   tajweed: {},

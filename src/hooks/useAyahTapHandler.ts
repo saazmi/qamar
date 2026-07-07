@@ -33,15 +33,21 @@ export function useAyahTapHandler() {
 
   return useCallback(
     (surah: number, ayah: number) => {
-      // Playback state overrides toolbar modes: while a surah is playing,
-      // tapping any ayah in that surah restarts playback from there.
-      if (playingAyah && playingAyah.surah === surah) {
+      // Playback state overrides toolbar modes ONLY while reading (no
+      // toolbar mode active). In Écouter/Marquer/etc. the mode's behavior
+      // wins so users can e.g. play a single ayah in Écouter without
+      // subsequent taps kicking off a continuous restart.
+      if (mode === 'read' && playingAyah && playingAyah.surah === surah) {
         const surahMeta = META.find((m) => m.id === surah);
         const ayahCount = surahMeta?.ayahCount ?? 1;
         void (async () => {
           await stopPlayback();
           await ensureAudioConfigured();
-          await playRange(surah, ayah, ayahCount, setPlayingAyah);
+          // Tap-to-jump inside an ongoing playback should NOT re-play the
+          // basmalah — that intro belongs to the fresh header-Play only.
+          await playRange(surah, ayah, ayahCount, setPlayingAyah, {
+            includeBasmalah: false,
+          });
         })();
         return;
       }
