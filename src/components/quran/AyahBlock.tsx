@@ -1,11 +1,10 @@
-// AyahBlock — one tappable ayah unit. SPEC §11.1–11.3.
-// Tap = safe (opens sheet, wired later). Long-press = cycle state through
-// none → learning → memorized → none with 5s undo snackbar.
+// AyahBlock — fragmented layout (FR translation on). SPEC §11.1–11.3.
+// Tap dispatches to the reading-mode handler (useAyahTapHandler).
+// Long-press removed 2026-07-07 — mode toolbar handles all actions now.
 
-import { memo, useCallback } from 'react';
+import { memo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useHifzStore } from '@stores/hifz';
-import { useUiStore } from '@stores/ui';
 import { light } from '@theme/colors';
 import type { AyahState } from '@core/hifz';
 
@@ -16,14 +15,8 @@ interface Props {
   frenchText?: string;
   showFrench?: boolean;
   fontSize?: number;
-  onOpenSheet?: (surah: number, ayah: number) => void;
+  onTap: (surah: number, ayah: number) => void;
 }
-
-const CYCLE: Record<'none' | 'learning' | 'memorized', 'learning' | 'memorized' | 'none'> = {
-  none: 'learning',
-  learning: 'memorized',
-  memorized: 'none',
-};
 
 function stateOf(records: ReturnType<typeof useHifzStore.getState>['records'], surah: number, ayah: number): AyahState {
   const r = records.find((rr) => rr.surah === surah && rr.ayah === ayah);
@@ -37,28 +30,9 @@ export const AyahBlock = memo(function AyahBlock({
   frenchText,
   showFrench,
   fontSize = 28,
-  onOpenSheet,
+  onTap,
 }: Props) {
   const state = useHifzStore((s) => stateOf(s.records, surah, ayah));
-  const setState = useHifzStore((s) => s.setState);
-  const undo = useHifzStore((s) => s.undo);
-  const showToast = useUiStore((s) => s.showToast);
-
-  const onLongPress = useCallback(() => {
-    const current = state === 'needsReview' ? 'memorized' : state;
-    const next = CYCLE[current as 'none' | 'learning' | 'memorized'];
-    setState(surah, ayah, next);
-    const label = { none: 'Effacé', learning: 'En cours', memorized: 'Mémorisé' }[next];
-    showToast({
-      message: `${label} · ${surah}:${ayah}`,
-      actionLabel: 'Annuler',
-      onAction: () => undo(),
-    });
-  }, [state, surah, ayah, setState, showToast, undo]);
-
-  const onTap = useCallback(() => {
-    onOpenSheet?.(surah, ayah);
-  }, [onOpenSheet, surah, ayah]);
 
   const style = [
     styles.block,
@@ -67,7 +41,7 @@ export const AyahBlock = memo(function AyahBlock({
   ];
 
   return (
-    <Pressable onPress={onTap} onLongPress={onLongPress} delayLongPress={350} style={style}>
+    <Pressable onPress={() => onTap(surah, ayah)} style={style}>
       {(state === 'memorized' || state === 'needsReview') && <View style={styles.surline} />}
       <View style={styles.row}>
         {state === 'needsReview' && (
@@ -75,18 +49,11 @@ export const AyahBlock = memo(function AyahBlock({
             <Text style={styles.badgeText}>↻</Text>
           </View>
         )}
-        <Text
-          style={[
-            styles.arabic,
-            { fontSize, lineHeight: Math.round(fontSize * 1.85) },
-          ]}
-        >
+        <Text style={[styles.arabic, { fontSize, lineHeight: Math.round(fontSize * 1.85) }]}>
           {text} <Text style={styles.marker}>﴿{ayah}﴾</Text>
         </Text>
       </View>
-      {showFrench && frenchText ? (
-        <Text style={styles.french}>{frenchText}</Text>
-      ) : null}
+      {showFrench && frenchText ? <Text style={styles.french}>{frenchText}</Text> : null}
     </Pressable>
   );
 });

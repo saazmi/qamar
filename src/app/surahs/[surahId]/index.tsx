@@ -1,5 +1,6 @@
 // Reading view. SPEC §11 — killer feature.
 // Two modes: continuous mushaf (FR off, default) / fragmented + translation (FR on).
+// Sticky mode toolbar drives all verse interactions via tap only.
 
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
@@ -7,28 +8,28 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { AyahBlock } from '@components/quran/AyahBlock';
 import { ContinuousPage } from '@components/quran/ContinuousPage';
+import { ReadingToolbar } from '@components/quran/ReadingToolbar';
 import { VerseSheet } from '@components/quran/VerseSheet';
-import { useSessionStore } from '@stores/session';
 import structure from '@content/structure.json';
 import ayahIndexJson from '@content/ayah-index.json';
 import { loadSurah } from '@content/text';
 import { loadSurah as loadFrench } from '@content/translation-fr';
 import type { AyahIndex, AyahText, SurahMeta } from '@content/types';
 import { keyOf } from '@core/hifz';
+import { useSessionStore } from '@stores/session';
+import { useAyahTapHandler } from '../../../hooks/useAyahTapHandler';
 import { light } from '@theme/colors';
 
 const meta = structure as SurahMeta[];
 const IDX = ayahIndexJson as AyahIndex;
 
 interface FragmentRow {
-  kind: 'ayah';
   ayah: number;
   text: string;
   french?: string;
 }
 
 interface PageRow {
-  kind: 'page';
   page: number;
   ayat: AyahText[];
 }
@@ -40,8 +41,8 @@ export default function ReadingViewScreen() {
   const surahMeta = meta.find((m) => m.id === id);
 
   const [showFrench, setShowFrench] = useState(false);
-  const openVerseSheet = useSessionStore((s) => s.openVerseSheet);
   const openVerse = useSessionStore((s) => s.openVerse);
+  const onTap = useAyahTapHandler();
 
   const ayat = useMemo(() => loadSurah(id) ?? [], [id]);
   const french = useMemo(() => loadFrench(id) ?? [], [id]);
@@ -49,7 +50,6 @@ export default function ReadingViewScreen() {
   const fragmentRows: FragmentRow[] = useMemo(() => {
     const frByAyah = new Map<number, string>(french.map((a: AyahText) => [a.ayah, a.text]));
     return ayat.map((a: AyahText) => ({
-      kind: 'ayah' as const,
       ayah: a.ayah,
       text: a.text,
       french: frByAyah.get(a.ayah),
@@ -67,7 +67,7 @@ export default function ReadingViewScreen() {
     }
     return [...byPage.entries()]
       .sort(([p1], [p2]) => p1 - p2)
-      .map(([page, ayahList]) => ({ kind: 'page' as const, page, ayat: ayahList }));
+      .map(([page, ayahList]) => ({ page, ayat: ayahList }));
   }, [ayat, id]);
 
   if (!surahMeta) {
@@ -95,6 +95,8 @@ export default function ReadingViewScreen() {
         </Pressable>
       </View>
 
+      <ReadingToolbar />
+
       {showFrench ? (
         <FlashList
           data={fragmentRows}
@@ -107,7 +109,7 @@ export default function ReadingViewScreen() {
               text={item.text}
               frenchText={item.french}
               showFrench
-              onOpenSheet={openVerseSheet}
+              onTap={onTap}
             />
           )}
         />
@@ -117,12 +119,7 @@ export default function ReadingViewScreen() {
           keyExtractor={(item) => `p${item.page}`}
           contentContainerStyle={{ padding: 20, paddingBottom: 96 }}
           renderItem={({ item }) => (
-            <ContinuousPage
-              surah={id}
-              page={item.page}
-              ayat={item.ayat}
-              onOpenSheet={openVerseSheet}
-            />
+            <ContinuousPage surah={id} page={item.page} ayat={item.ayat} onTap={onTap} />
           )}
         />
       )}
