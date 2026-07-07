@@ -1,15 +1,134 @@
-// Content pipeline entry. SPEC §8.6.
-// Downloads/reads raw source files (Tanzil et al.), normalizes, splits per-surah,
-// writes into src/content/. Generated files ARE committed (SPEC §8.6 reproducibility).
+// Content pipeline entry. SPEC §8.6, §25 Phase 1.
+// Downloads Tanzil-sourced editions via api.alquran.cloud (Quran Foundation-adjacent,
+// Tanzil-sourced JSON API, no auth). Caches raw responses under scripts/.cache/
+// (gitignored). Writes normalized per-surah + structure + ayah-index JSON into
+// src/content/ (generated files ARE committed for reproducibility — SPEC §8.6).
 // Runs OFFLINE at build time only — app never fetches text at runtime.
 
-async function main(): Promise<void> {
-  throw new Error('not implemented — Phase 1 (SPEC §25)');
+import { promises as fs } from 'node:fs';
+import * as path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const ROOT = path.resolve(__dirname, '..');
+const CACHE_DIR = path.join(ROOT, 'scripts', '.cache');
+const OUT_DIR = path.join(ROOT, 'src', 'content');
+const FR_NAMES_PATH = path.join(ROOT, 'scripts', 'data', 'surahs-fr.json');
+
+const EDITIONS = {
+  arabic: 'quran-simple', // Tanzil Imlaei simple with tashkeel (harakat)
+  french: 'fr.hamidullah', // Muhammad Hamidullah
+} as const;
+
+const API_BASE = 'https://api.alquran.cloud/v1';
+
+interface RawAyah {
+  numberInSurah: number;
+  text: string;
+  juz: number;
+  hizbQuarter: number;
+  page: number;
 }
 
-if (require.main === module) {
-  main().catch((e) => {
-    console.error(e);
-    process.exit(1);
-  });
+interface RawSurah {
+  number: number;
+  name: string;
+  englishName: string;
+  revelationType: string;
+  ayahs: RawAyah[];
 }
+
+interface RawQuranResponse {
+  data: { surahs: RawSurah[] };
+}
+
+async function ensureDir(dir: string): Promise<void> {
+  await fs.mkdir(dir, { recursive: true });
+}
+
+async function cachedFetch(cacheName: string, url: string): Promise<RawQuranResponse> {
+  await ensureDir(CACHE_DIR);
+  const cachePath = path.join(CACHE_DIR, cacheName);
+  try {
+    const raw = await fs.readFile(cachePath, 'utf8');
+    console.log(`[cache hit] ${cacheName}`);
+    return JSON.parse(raw) as RawQuranResponse;
+  } catch {
+    console.log(`[fetch] ${url}`);
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`fetch ${url} → ${res.status}`);
+    const raw = await res.text();
+    await fs.writeFile(cachePath, raw, 'utf8');
+    return JSON.parse(raw) as RawQuranResponse;
+  }
+}
+
+function pad3(n: number): string {
+  return n.toString().padStart(3, '0');
+}
+
+function normalizeRevelation(t: string): 'makkah' | 'madinah' {
+  const lower = t.toLowerCase();
+  if (lower.startsWith('meccan') || lower.startsWith('makk')) return 'makkah';
+  return 'madinah';
+}
+
+async function writeJson(target: string, data: unknown): Promise<void> {
+  await ensureDir(path.dirname(target));
+  await fs.writeFile(target, JSON.stringify(data, null, 2) + '\n', 'utf8');
+}
+
+async function main(): Promise<void> {
+  const [arabic, french] = await Promise.all([
+    cachedFetch(`${EDITIONS.arabic}.json`, `${API_BASE}/quran/${EDITIONS.arabic}`),
+    cachedFetch(`${EDITIONS.french}.json`, `${API_BASE}/quran/${EDITIONS.french}`),
+  ]);
+
+  const frNamesRaw = await fs.readFile(FR_NAMES_PATH, 'utf8');
+  const frNames = JSON.parse(frNamesRaw) as Record<string, string>;
+
+  const structure = arabic.data.surahs.map((s) => ({
+    id: s.number,
+    nameArabic: s.name,
+    nameTransliterated: s.englishName,
+    nameFrench: frNames[String(s.number)] ?? s.englishName,
+    ayahCount: s.ayahs.length,
+    revelationPlace: normalizeRevelation(s.revelationType),
+  }));
+
+  const ayahIndex: Record<string, { juz: number; hizbQuarter: number; page: number }> = {};
+
+  const stripBom = (s: string): string => s.replace(/^﻿/, '');
+
+  for (const surah of arabic.data.surahs) {
+    const text = surah.ayahs.map((a) => ({ ayah: a.numberInSurah, text: stripBom(a.text) }));
+    await writeJson(path.join(OUT_DIR, 'text', `${pad3(surah.number)}.json`), text);
+    for (const a of surah.ayahs) {
+      ayahIndex[`${surah.number}:${a.numberInSurah}`] = {
+        juz: a.juz,
+        hizbQuarter: a.hizbQuarter,
+        page: a.page,
+      };
+    }
+  }
+
+  for (const surah of french.data.surahs) {
+    const text = surah.ayahs.map((a) => ({ ayah: a.numberInSurah, text: stripBom(a.text) }));
+    await writeJson(
+      path.join(OUT_DIR, 'translation-fr', `${pad3(surah.number)}.json`),
+      text,
+    );
+  }
+
+  await writeJson(path.join(OUT_DIR, 'structure.json'), structure);
+  await writeJson(path.join(OUT_DIR, 'ayah-index.json'), ayahIndex);
+
+  const total = Object.keys(ayahIndex).length;
+  console.log(`✓ wrote ${structure.length} surahs, ${total} ayat`);
+}
+
+main().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});

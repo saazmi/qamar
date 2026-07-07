@@ -11,11 +11,13 @@ screen renders these attributions in-app.
 --------------------------------------------------------------------------
 1. Quran Arabic Text (Imlaei, Hafs `an `Asim)
 --------------------------------------------------------------------------
-Source:       TBD (candidate: Tanzil.net "Imlaei simple")
-Edition:      TBD
-License:      TBD (Tanzil non-commercial + attribution terms)
-URL:          TBD
-Retrieved:    TBD
+Source:       Tanzil "quran-simple" edition (Imlaei with tashkeel/harakat)
+Edition:      quran-simple
+License:      Tanzil non-commercial + attribution (https://tanzil.net/docs/license)
+Delivery:     Fetched at build time via api.alquran.cloud v1
+URL:          https://api.alquran.cloud/v1/quran/quran-simple
+              (source: https://tanzil.net/download/)
+Retrieved:    2026-07-07
 
 Status: single Arabic edition in v1 (owner decision D2, 2026-07-07).
         Uthmani not bundled in v1.
@@ -23,11 +25,14 @@ Status: single Arabic edition in v1 (owner decision D2, 2026-07-07).
 --------------------------------------------------------------------------
 2. French Translation — Muhammad Hamidullah
 --------------------------------------------------------------------------
-Source:       Tanzil translations collection (owner decision D4, 2026-07-07)
-Edition:      TBD (record during Phase 1 pipeline run)
-License:      TBD
-URL:          https://tanzil.net/trans/  (verify current edition & terms)
-Retrieved:    TBD
+Source:       Tanzil translations collection, fr.hamidullah edition
+              (owner decision D4, 2026-07-07)
+Edition:      fr.hamidullah
+License:      Tanzil non-commercial + attribution
+Delivery:     Fetched at build time via api.alquran.cloud v1
+URL:          https://api.alquran.cloud/v1/quran/fr.hamidullah
+              (source: https://tanzil.net/trans/fr.hamidullah)
+Retrieved:    2026-07-07
 
 --------------------------------------------------------------------------
 3. Tajweed Annotations (v1.1, spike-gated — SPEC §8.3, D5)
