@@ -49,6 +49,7 @@ function findRunStart(records: ReturnType<typeof useHifzStore.getState>['records
 export function VerseSheet() {
   const openVerse = useSessionStore((s) => s.openVerse);
   const close = useSessionStore((s) => s.closeVerseSheet);
+  const openNoteViewer = useSessionStore((s) => s.openNoteViewer);
   const records = useHifzStore((s) => s.records);
   const setState = useHifzStore((s) => s.setState);
   const applyRange = useHifzStore((s) => s.applyRange);
@@ -187,30 +188,32 @@ export function VerseSheet() {
                 <Text style={styles.notesEmpty}>Aucune note</Text>
               ) : (
                 <>
-                  {verseNotes.map((n) => (
-                    <View key={n.id} style={styles.noteCard}>
-                      <Text style={styles.noteScope}>Verset · {n.kind === 'canvas' ? 'dessin' : 'texte'}</Text>
-                      {n.kind === 'canvas' ? (
-                        <View style={styles.canvasWrap}>
-                          <CanvasView body={n.body} width={280} />
-                        </View>
-                      ) : (
-                        <Text style={styles.noteBody}>{n.body}</Text>
-                      )}
-                    </View>
-                  ))}
-                  {surahNotes.map((n) => (
-                    <View key={n.id} style={styles.noteCard}>
-                      <Text style={styles.noteScope}>Sourate · {n.kind === 'canvas' ? 'dessin' : 'texte'}</Text>
-                      {n.kind === 'canvas' ? (
-                        <View style={styles.canvasWrap}>
-                          <CanvasView body={n.body} width={280} />
-                        </View>
-                      ) : (
-                        <Text style={styles.noteBody}>{n.body}</Text>
-                      )}
-                    </View>
-                  ))}
+                  {[...verseNotes, ...surahNotes].map((n) => {
+                    const scopeLabel = n.scope === 'ayah' ? 'Verset' : 'Sourate';
+                    return (
+                      <View key={n.id} style={styles.noteCard}>
+                        <Text style={styles.noteScope}>
+                          {scopeLabel} · {n.kind === 'canvas' ? 'dessin' : 'texte'}
+                        </Text>
+                        {n.kind === 'canvas' ? (
+                          <View style={styles.canvasWrap}>
+                            <CanvasView body={n.body} width={280} />
+                          </View>
+                        ) : (
+                          <Text style={styles.noteBody} numberOfLines={4}>
+                            {n.body}
+                          </Text>
+                        )}
+                        <Pressable
+                          onPress={() => openNoteViewer(n.id)}
+                          style={styles.viewBtn}
+                          hitSlop={8}
+                        >
+                          <Text style={styles.viewLabel}>Voir en grand</Text>
+                        </Pressable>
+                      </View>
+                    );
+                  })}
                 </>
               )}
             </View>
@@ -393,5 +396,14 @@ const styles = StyleSheet.create({
   canvasWrap: {
     alignItems: 'center',
     marginTop: 4,
+  },
+  viewBtn: {
+    marginTop: 8,
+    alignSelf: 'flex-end',
+  },
+  viewLabel: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 12,
+    color: light.accent,
   },
 });

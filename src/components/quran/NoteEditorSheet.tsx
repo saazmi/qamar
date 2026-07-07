@@ -30,6 +30,7 @@ const STORAGE_WARN_BYTES = 4 * 1024 * 1024; // ~4 MB — approaching Android Asy
 export function NoteEditorSheet() {
   const target = useSessionStore((s) => s.noteEditor);
   const close = useSessionStore((s) => s.closeNoteEditor);
+  const openNoteViewer = useSessionStore((s) => s.openNoteViewer);
   const allNotes = useNotesStore((s) => s.notes);
   const addNote = useNotesStore((s) => s.addNote);
   const updateNote = useNotesStore((s) => s.updateNote);
@@ -214,6 +215,9 @@ export function NoteEditorSheet() {
                         <View style={styles.actionsRow}>
                           <Pressable onPress={() => handleDelete(n)} hitSlop={8}>
                             <Text style={styles.actionMuted}>Supprimer</Text>
+                          </Pressable>
+                          <Pressable onPress={() => openNoteViewer(n.id)} hitSlop={8}>
+                            <Text style={styles.actionMuted}>Voir</Text>
                           </Pressable>
                           <Pressable onPress={() => startEdit(n)} hitSlop={8}>
                             <Text style={styles.action}>Modifier</Text>
