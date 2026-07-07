@@ -1,23 +1,34 @@
-// Today screen. SPEC §10.2 — the anti-overwhelm centerpiece.
-// At most 3 cards: Continue learning · Review · Start something new.
+// Today screen. SPEC §10.2.
+//
+// Free-mode default: nothing is nudged — just progress stats and a way into
+// the surahs. Guided features (revision reminders, assisted planning) live
+// behind explicit toggles in Settings; when on, they add cards below the
+// stat card.
 
 import { Link, useRouter } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { ArrowRight, BookOpen, RefreshCcw, Sparkles } from 'lucide-react-native';
+import { ArrowRight, RefreshCcw, Settings, Sparkles } from 'lucide-react-native';
 import { useSurahProgress } from '../hooks/useSurahProgress';
 import { useTodayContext } from '../hooks/useTodayContext';
+import { useSettingsStore } from '@stores/settings';
 import { light } from '@theme/colors';
 
 export default function TodayScreen() {
   const router = useRouter();
   const { overall } = useSurahProgress();
-  const { due, continueTarget, suggestion } = useTodayContext();
+  const { due } = useTodayContext();
+  const features = useSettingsStore((s) => s.features);
   const pct = Math.round((overall.memorized / overall.total) * 1000) / 10;
 
   return (
     <ScrollView contentContainerStyle={styles.host}>
       <View style={styles.brand}>
-        <Text style={styles.title}>Qamar</Text>
+        <View style={styles.brandRow}>
+          <Text style={styles.title}>Qamar</Text>
+          <Pressable onPress={() => router.push('/settings')} hitSlop={12}>
+            <Settings size={18} color={light.textMuted} />
+          </Pressable>
+        </View>
         <Text style={styles.tag}>Mémorise le Coran, un petit pas à la fois.</Text>
       </View>
 
@@ -30,31 +41,7 @@ export default function TodayScreen() {
         <Text style={styles.statPct}>{pct.toFixed(1)} %</Text>
       </View>
 
-      {continueTarget && (
-        <Link
-          href={{
-            pathname: '/surahs/[surahId]',
-            params: { surahId: String(continueTarget.surah) },
-          }}
-          asChild
-        >
-          <Pressable style={styles.card}>
-            <View style={styles.cardHead}>
-              <BookOpen size={16} color={light.accent} />
-              <Text style={styles.cardLabel}>Continuer</Text>
-            </View>
-            <Text style={styles.cardTitle}>
-              {continueTarget.surahName} · verset {continueTarget.ayah}
-            </Text>
-            <View style={styles.cardFoot}>
-              <Text style={styles.cardCta}>Reprendre</Text>
-              <ArrowRight size={14} color={light.accent} />
-            </View>
-          </Pressable>
-        </Link>
-      )}
-
-      {due.length > 0 && (
+      {features.revisionReminder && due.length > 0 && (
         <Link href="/review" asChild>
           <Pressable style={styles.reviewCard}>
             <View style={styles.cardHead}>
@@ -72,26 +59,18 @@ export default function TodayScreen() {
         </Link>
       )}
 
-      {suggestion && (
-        <Link
-          href={{
-            pathname: '/surahs/[surahId]',
-            params: { surahId: String(suggestion.surah) },
-          }}
-          asChild
-        >
-          <Pressable style={styles.card}>
-            <View style={styles.cardHead}>
-              <Sparkles size={16} color={light.accentSecondary} />
-              <Text style={styles.cardLabel}>Nouvelle portion</Text>
-            </View>
-            <Text style={styles.cardTitle}>{suggestion.surahName}</Text>
-            <View style={styles.cardFoot}>
-              <Text style={styles.cardCta}>Commencer</Text>
-              <ArrowRight size={14} color={light.accent} />
-            </View>
-          </Pressable>
-        </Link>
+      {features.assistedPlanning && (
+        <View style={styles.card}>
+          <View style={styles.cardHead}>
+            <Sparkles size={16} color={light.accentSecondary} />
+            <Text style={styles.cardLabel}>Planification</Text>
+          </View>
+          <Text style={styles.cardTitle}>À configurer</Text>
+          <Text style={styles.cardBody}>
+            Répondez à quelques questions pour générer un plan personnalisé.
+          </Text>
+          <Text style={styles.cardCta}>Bientôt disponible</Text>
+        </View>
       )}
 
       <Link href="/surahs" asChild>
@@ -114,6 +93,11 @@ const styles = StyleSheet.create({
   },
   brand: {
     marginBottom: 4,
+  },
+  brandRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   title: {
     fontFamily: 'Inter_700Bold',
@@ -163,7 +147,7 @@ const styles = StyleSheet.create({
     padding: 18,
     borderWidth: 1,
     borderColor: light.border,
-    gap: 8,
+    gap: 6,
   },
   reviewCard: {
     backgroundColor: light.state.memorizedBg,
@@ -196,6 +180,12 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter_600SemiBold',
     fontSize: 18,
     color: light.text,
+  },
+  cardBody: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 13,
+    lineHeight: 18,
+    color: light.textMuted,
   },
   reviewValue: {
     fontFamily: 'Inter_700Bold',
