@@ -1,8 +1,10 @@
 // Surah list. SPEC §10.3. FlashList of 114 rows, tri-color progress bars.
 
 import { Link, useRouter } from 'expo-router';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useMemo, useState } from 'react';
+import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
+import { Search, X } from 'lucide-react-native';
 import { SurahProgressBar } from '@components/tracking/SurahProgressBar';
 import structure from '@content/structure.json';
 import type { SurahMeta } from '@content/types';
@@ -11,9 +13,28 @@ import { light } from '@theme/colors';
 
 const META = structure as SurahMeta[];
 
+const norm = (s: string): string =>
+  s
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, ''); // strip diacritics so 'A`raf' matches 'aaraf' etc.
+
 export default function SurahListScreen() {
   const router = useRouter();
   const { perSurah, overall } = useSurahProgress();
+  const [query, setQuery] = useState('');
+
+  const filtered = useMemo(() => {
+    const q = query.trim();
+    if (!q) return META;
+    const nq = norm(q);
+    return META.filter((s) => {
+      if (String(s.id).startsWith(q)) return true;
+      if (norm(s.nameTransliterated).includes(nq)) return true;
+      if (s.nameArabic.includes(q)) return true;
+      return false;
+    });
+  }, [query]);
 
   return (
     <View style={styles.host}>
@@ -30,8 +51,27 @@ export default function SurahListScreen() {
         <View style={{ width: 24 }} />
       </View>
 
+      <View style={styles.searchRow}>
+        <Search size={16} color={light.textMuted} />
+        <TextInput
+          value={query}
+          onChangeText={setQuery}
+          placeholder="Rechercher une sourate…"
+          placeholderTextColor={light.textMuted}
+          style={styles.searchInput}
+          autoCorrect={false}
+          autoCapitalize="none"
+          returnKeyType="search"
+        />
+        {query.length > 0 && (
+          <Pressable onPress={() => setQuery('')} hitSlop={8}>
+            <X size={16} color={light.textMuted} />
+          </Pressable>
+        )}
+      </View>
+
       <FlashList
-        data={META}
+        data={filtered}
         keyExtractor={(s) => String(s.id)}
         contentContainerStyle={{ paddingHorizontal: 12, paddingBottom: 32 }}
         renderItem={({ item }) => {
@@ -110,6 +150,27 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: light.textMuted,
     marginTop: 2,
+  },
+  searchRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginHorizontal: 12,
+    marginTop: 10,
+    marginBottom: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: light.border,
+    backgroundColor: light.surface,
+  },
+  searchInput: {
+    flex: 1,
+    fontFamily: 'Inter_400Regular',
+    fontSize: 14,
+    color: light.text,
+    padding: 0,
   },
   row: {
     flexDirection: 'row',
