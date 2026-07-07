@@ -854,7 +854,7 @@ The agent must not resolve these silently; open a GitHub issue for each at proje
 - **D2 — Script default**: **Resolved — Imlaei only** (2026-07-07). Uthmani not bundled in v1.
 - **D3 — Qari**: **Deferred** (owner note 2026-07-07): licensing concern flagged. Al-Husary via EveryAyah is the SPEC placeholder pending verification; owner will investigate CC-licensed / open-source qari options before v1 ships audio. Architecture (`QariSource` interface, §12.2) already makes the swap config-only. Until resolved, treat audio features as "must not block ship if source unavailable" — v1 may ship text-only if needed.
 - **D4 — French translation edition**: **Resolved — Muhammad Hamidullah** (2026-07-07), via Tanzil redistribution. Exact edition + license text captured during Phase 1 content-pipeline run.
-- **D5 — Tajweed in v1.1**: proceed only if Spike B passes; owner reviews the spike report.
+- **D5 — Tajweed in v1.1**: **Low priority** (owner note 2026-07-07) — worth exploring, not urgent. Run Spike B opportunistically inside Phase 1; if it slips, tajweed simply stays in the v1.1+ backlog. Ship v1 with plain black text + harakat regardless. Reading view remains architected so tajweed is purely additive (§8.3).
 - **D6 — Daily reminder default**: **Resolved — opt-in, off by default** (2026-07-07). Matches §15.4 and §15.8; discoverability handled via a one-time hint in Settings on first Today-screen visit.
 
 ---
