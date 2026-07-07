@@ -1,14 +1,21 @@
 // Range operations. SPEC §9.4. One call, one activity-log entry, one undo unit.
 
 import type { AyahRecord, SurahId, AyahNumber } from './types';
+import { setState } from './states';
 
 export function applyRange(
-  _records: AyahRecord[],
-  _surah: SurahId,
-  _fromAyah: AyahNumber,
-  _toAyah: AyahNumber,
-  _target: 'none' | 'learning' | 'memorized',
-  _now: string,
+  records: AyahRecord[],
+  surah: SurahId,
+  fromAyah: AyahNumber,
+  toAyah: AyahNumber,
+  target: 'none' | 'learning' | 'memorized',
+  now: string,
 ): AyahRecord[] {
-  throw new Error('not implemented — Phase 2 (SPEC §25)');
+  const lo = Math.min(fromAyah, toAyah);
+  const hi = Math.max(fromAyah, toAyah);
+  let next = records;
+  for (let a = lo; a <= hi; a++) {
+    next = setState(next, surah, a, target, now);
+  }
+  return next;
 }

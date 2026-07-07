@@ -58,6 +58,17 @@
     "typescript": "^5.4.0"
   },
   "jest": {
-    "preset": "jest-expo"
+    "preset": "jest-expo",
+    "moduleNameMapper": {
+      "^@/(.*)$": "<rootDir>/src/$1",
+      "^@core/(.*)$": "<rootDir>/src/core/$1",
+      "^@components/(.*)$": "<rootDir>/src/components/$1",
+      "^@content/(.*)$": "<rootDir>/src/content/$1",
+      "^@db/(.*)$": "<rootDir>/src/db/$1",
+      "^@audio/(.*)$": "<rootDir>/src/audio/$1",
+      "^@stores/(.*)$": "<rootDir>/src/stores/$1",
+      "^@theme/(.*)$": "<rootDir>/src/theme/$1",
+      "^@i18n/(.*)$": "<rootDir>/src/i18n/$1"
+    }
   }
 }

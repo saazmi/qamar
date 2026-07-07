@@ -1,10 +1,17 @@
-// Placeholder — hifz-core has 100% branch-coverage target (SPEC §22, §26).
+// hifz-core smoke exports test. Detailed tests in the per-module *.test.ts files.
+// SPEC §22, §26 — 100% branch-coverage target.
 
-describe('hifz-core', () => {
-  it.todo('state transitions (SPEC §9.3)');
-  it.todo('range ops: single, whole surah, overlapping (SPEC §9.4)');
-  it.todo('chunk derivation: merging, page splitting, boundary shifts (SPEC §14.1)');
-  it.todo('ladder math including "Difficile" demotion (SPEC §14.4)');
-  it.todo('due logic with fake clocks (SPEC §14.3)');
-  it.todo('daily budget capping (SPEC §14.3)');
+import * as core from '@core/hifz';
+
+describe('hifz-core public API surface', () => {
+  it('re-exports states, ranges, chunks, scheduler, aggregates', () => {
+    expect(typeof core.getState).toBe('function');
+    expect(typeof core.setState).toBe('function');
+    expect(typeof core.applyRange).toBe('function');
+    expect(typeof core.deriveChunks).toBe('function');
+    expect(typeof core.dueChunks).toBe('function');
+    expect(typeof core.markReviewed).toBe('function');
+    expect(typeof core.overallProgress).toBe('function');
+    expect(core.LADDER_DAYS).toEqual([1, 3, 7, 14, 30, 60]);
+  });
 });

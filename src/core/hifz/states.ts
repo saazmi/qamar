@@ -2,17 +2,55 @@
 
 import type { AyahRecord, AyahState, SurahId, AyahNumber } from './types';
 
-export function getState(records: AyahRecord[], surah: SurahId, ayah: AyahNumber): AyahState {
-  const r = records.find((x) => x.surah === surah && x.ayah === ayah);
-  return r?.state ?? 'none';
+export function findRecord(
+  records: AyahRecord[],
+  surah: SurahId,
+  ayah: AyahNumber,
+): AyahRecord | undefined {
+  return records.find((r) => r.surah === surah && r.ayah === ayah);
+}
+
+export function getState(
+  records: AyahRecord[],
+  surah: SurahId,
+  ayah: AyahNumber,
+): AyahState {
+  return findRecord(records, surah, ayah)?.state ?? 'none';
 }
 
 export function setState(
-  _records: AyahRecord[],
-  _surah: SurahId,
-  _ayah: AyahNumber,
-  _next: 'none' | 'learning' | 'memorized',
-  _now: string,
+  records: AyahRecord[],
+  surah: SurahId,
+  ayah: AyahNumber,
+  next: 'none' | 'learning' | 'memorized',
+  now: string,
 ): AyahRecord[] {
-  throw new Error('not implemented — Phase 2 (SPEC §25)');
+  const existing = findRecord(records, surah, ayah);
+
+  if (next === 'none') {
+    if (!existing) return records;
+    return records.filter((r) => r !== existing);
+  }
+
+  if (!existing) {
+    const created: AyahRecord = {
+      surah,
+      ayah,
+      state: next,
+      updatedAt: now,
+      memorizedAt: next === 'memorized' ? now : undefined,
+      reviewCount: 0,
+      ladderOffset: 0,
+    };
+    return [...records, created];
+  }
+
+  const updated: AyahRecord = {
+    ...existing,
+    state: next,
+    updatedAt: now,
+    memorizedAt:
+      existing.memorizedAt ?? (next === 'memorized' ? now : undefined),
+  };
+  return records.map((r) => (r === existing ? updated : r));
 }
