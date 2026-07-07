@@ -1,5 +1,6 @@
-// Verse-scoped note editor. Opens when Notes mode + tap on an ayah.
-// Supports two note kinds — text and canvas (mutually exclusive per note).
+// Note editor. Ayah-scoped when Notes mode + tap on an ayah; surah-scoped
+// when opened via the reading-view header. Handles both scopes uniformly.
+// Two note kinds — text and canvas (mutually exclusive per note).
 
 import { useMemo, useRef, useState } from 'react';
 import {
@@ -47,19 +48,25 @@ export function NoteEditorSheet() {
   const editCanvasRef = useRef<CanvasHandle | null>(null);
   const [viewingId, setViewingId] = useState<string | null>(null);
 
+  const isSurahScope = target != null && target.ayah === undefined;
+  const scope: 'ayah' | 'surah' = isSurahScope ? 'surah' : 'ayah';
+
   const meta = target ? META.find((m) => m.id === target.surah) : undefined;
   const arabicText = useMemo(() => {
-    if (!target) return '';
+    if (!target || target.ayah === undefined) return '';
     const list = loadSurah(target.surah) ?? [];
     return list.find((a: AyahText) => a.ayah === target.ayah)?.text ?? '';
   }, [target]);
 
-  const verseNotes = useMemo(() => {
+  const notes = useMemo(() => {
     if (!target) return [] as Note[];
+    if (isSurahScope) {
+      return allNotes.filter((n) => n.scope === 'surah' && n.surah === target.surah);
+    }
     return allNotes.filter(
       (n) => n.scope === 'ayah' && n.surah === target.surah && n.ayah === target.ayah,
     );
-  }, [allNotes, target]);
+  }, [allNotes, target, isSurahScope]);
 
   if (!target || !meta) return null;
 
@@ -76,14 +83,14 @@ export function NoteEditorSheet() {
     if (draftKind === 'text') {
       const body = draftText.trim();
       if (!body) return;
-      addNote({ scope: 'ayah', kind: 'text', surah: target.surah, ayah: target.ayah, body });
+      addNote({ scope, kind: 'text', surah: target.surah, ayah: target.ayah, body });
       warnIfNearCap(body.length);
       setDraftText('');
     } else {
       const c = canvasRef.current;
       if (!c || c.isEmpty()) return;
       const body = c.serialize();
-      addNote({ scope: 'ayah', kind: 'canvas', surah: target.surah, ayah: target.ayah, body });
+      addNote({ scope, kind: 'canvas', surah: target.surah, ayah: target.ayah, body });
       warnIfNearCap(body.length);
       c.clear();
     }
@@ -114,7 +121,7 @@ export function NoteEditorSheet() {
       actionLabel: 'Annuler',
       onAction: () => {
         addNote({
-          scope: 'ayah',
+          scope: note.scope,
           kind: note.kind,
           surah: note.surah,
           ayah: note.ayah,
@@ -148,22 +155,30 @@ export function NoteEditorSheet() {
 
               <View style={styles.headerRow}>
                 <Text style={styles.ref}>
-                  {meta.nameTransliterated} · {target.surah}:{target.ayah}
+                  {isSurahScope
+                    ? `${meta.nameTransliterated} · sourate`
+                    : `${meta.nameTransliterated} · ${target.surah}:${target.ayah}`}
                 </Text>
                 <Pressable onPress={close} hitSlop={12}>
                   <Text style={styles.close}>×</Text>
                 </Pressable>
               </View>
 
-              <Text style={styles.arabic} selectable>
-                {arabicText}
-              </Text>
+              {!isSurahScope && (
+                <Text style={styles.arabic} selectable>
+                  {arabicText}
+                </Text>
+              )}
 
               <Text style={styles.sectionLabel}>Notes existantes</Text>
-              {verseNotes.length === 0 ? (
-                <Text style={styles.empty}>Aucune note pour ce verset.</Text>
+              {notes.length === 0 ? (
+                <Text style={styles.empty}>
+                  {isSurahScope
+                    ? 'Aucune note pour cette sourate.'
+                    : 'Aucune note pour ce verset.'}
+                </Text>
               ) : (
-                verseNotes.map((n) => (
+                notes.map((n) => (
                   <View key={n.id} style={styles.noteCard}>
                     <View style={styles.noteHeader}>
                       <Text style={styles.noteKindPill}>

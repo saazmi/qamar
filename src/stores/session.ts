@@ -32,8 +32,9 @@ interface SessionState {
   rangeSelection: RangeSelection | null;
   setRangeSelection: (v: RangeSelection | null) => void;
 
-  noteEditor: OpenVerse | null;
-  openNoteEditor: (surah: number, ayah: number) => void;
+  // ayah undefined ⇒ surah-scoped note editor.
+  noteEditor: { surah: number; ayah?: number } | null;
+  openNoteEditor: (surah: number, ayah?: number) => void;
   closeNoteEditor: () => void;
 }
 
@@ -54,4 +55,7 @@ export const useSessionStore = create<SessionState>((set) => ({
   noteEditor: null,
   openNoteEditor: (surah, ayah) => set({ noteEditor: { surah, ayah } }),
   closeNoteEditor: () => set({ noteEditor: null }),
+
+  // NOTE: existing typing kept for now — openVerseSheet/openNoteEditor share
+  // (surah, ayah) but noteEditor tolerates undefined ayah for surah scope.
 }));

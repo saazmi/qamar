@@ -6,6 +6,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
+import { NotebookPen } from 'lucide-react-native';
 import { AyahBlock } from '@components/quran/AyahBlock';
 import { ContinuousPage } from '@components/quran/ContinuousPage';
 import { NoteEditorSheet } from '@components/quran/NoteEditorSheet';
@@ -18,6 +19,7 @@ import { loadSurah } from '@content/text';
 import { loadSurah as loadFrench } from '@content/translation-fr';
 import type { AyahIndex, AyahText, SurahMeta } from '@content/types';
 import { keyOf } from '@core/hifz';
+import { useNotesStore } from '@stores/notes';
 import { useSessionStore } from '@stores/session';
 import { useAyahTapHandler } from '../../../hooks/useAyahTapHandler';
 import { light } from '@theme/colors';
@@ -46,6 +48,10 @@ export default function ReadingViewScreen() {
   const openVerse = useSessionStore((s) => s.openVerse);
   const rangeSelection = useSessionStore((s) => s.rangeSelection);
   const noteEditor = useSessionStore((s) => s.noteEditor);
+  const openNoteEditor = useSessionStore((s) => s.openNoteEditor);
+  const surahNoteCount = useNotesStore((s) =>
+    s.notes.reduce((n, note) => (note.scope === 'surah' && note.surah === id ? n + 1 : n), 0),
+  );
   const onTap = useAyahTapHandler();
 
   const ayat = useMemo(() => loadSurah(id) ?? [], [id]);
@@ -94,6 +100,19 @@ export default function ReadingViewScreen() {
             {surahMeta.nameTransliterated} · {surahMeta.ayahCount} versets
           </Text>
         </View>
+        <Pressable
+          onPress={() => openNoteEditor(id)}
+          hitSlop={12}
+          style={styles.notesBtn}
+          accessibilityLabel="Notes de sourate"
+        >
+          <NotebookPen size={18} color={light.textMuted} />
+          {surahNoteCount > 0 && (
+            <View style={styles.notesBadge}>
+              <Text style={styles.notesBadgeText}>{surahNoteCount}</Text>
+            </View>
+          )}
+        </Pressable>
         <Pressable onPress={() => setShowFrench((v) => !v)} hitSlop={12}>
           <Text style={[styles.toggle, showFrench && styles.toggleOn]}>FR</Text>
         </Pressable>
@@ -183,6 +202,27 @@ const styles = StyleSheet.create({
   toggleOn: {
     color: light.accent,
     borderColor: light.accent,
+  },
+  notesBtn: {
+    position: 'relative',
+    paddingHorizontal: 4,
+  },
+  notesBadge: {
+    position: 'absolute',
+    top: -4,
+    right: -4,
+    minWidth: 16,
+    height: 16,
+    borderRadius: 8,
+    paddingHorizontal: 4,
+    backgroundColor: light.accentSecondary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  notesBadgeText: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 10,
+    color: '#FFFFFF',
   },
   center: {
     flex: 1,
