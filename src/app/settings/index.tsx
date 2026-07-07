@@ -1,8 +1,20 @@
 // Settings screen. SPEC §10.6.
 
 import { useRouter } from 'expo-router';
-import { Pressable, StyleSheet, Switch, Text, View } from 'react-native';
-import { useSettingsStore, type FeatureFlags } from '@stores/settings';
+import {
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Switch,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
+import {
+  useSettingsStore,
+  type FeatureFlags,
+  type ReminderConfig,
+} from '@stores/settings';
 import { light } from '@theme/colors';
 
 interface ToggleRow {
@@ -16,22 +28,36 @@ const FEATURE_ROWS: readonly ToggleRow[] = [
     key: 'revisionReminder',
     label: 'Rappels de révision',
     description:
-      "Suggère les chunks à réviser en fonction de la date de mémorisation (ladder 1→3→7→14→30→60 jours).",
+      "Liste sur la page d'accueil les sourates dont la dernière mémorisation dépasse le délai que vous fixez.",
   },
   {
     key: 'assistedPlanning',
     label: 'Planification assistée',
     description:
-      "Un plan personnalisé : quelques questions, une cadence adaptée et une estimation de temps qui se met à jour selon votre rythme.",
+      "Un plan personnalisé avec cadence adaptée et estimation de temps qui se met à jour selon votre rythme.",
   },
+];
+
+interface ReminderFieldDef {
+  key: keyof ReminderConfig;
+  label: string;
+  unit: string;
+  min: number;
+  max: number;
+}
+
+const REMINDER_FIELDS: readonly ReminderFieldDef[] = [
+  { key: 'remindAfterDays', label: 'Rappel après', unit: 'jours', min: 1, max: 365 },
+  { key: 'frequencyDays', label: 'Fréquence', unit: 'jours', min: 1, max: 90 },
+  { key: 'hourOfDay', label: 'Heure de rappel', unit: 'h', min: 0, max: 23 },
 ];
 
 export default function SettingsScreen() {
   const router = useRouter();
   const features = useSettingsStore((s) => s.features);
   const setFeature = useSettingsStore((s) => s.setFeature);
-  const dailyBudget = useSettingsStore((s) => s.dailyBudget);
-  const setDailyBudget = useSettingsStore((s) => s.setDailyBudget);
+  const reminder = useSettingsStore((s) => s.reminder);
+  const setReminder = useSettingsStore((s) => s.setReminder);
 
   return (
     <View style={styles.host}>
@@ -43,7 +69,7 @@ export default function SettingsScreen() {
         <View style={{ width: 24 }} />
       </View>
 
-      <View style={styles.body}>
+      <ScrollView contentContainerStyle={styles.body}>
         <Text style={styles.sectionLabel}>Fonctionnalités</Text>
         {FEATURE_ROWS.map((row) => (
           <View key={row.key} style={styles.card}>
@@ -64,35 +90,31 @@ export default function SettingsScreen() {
           <>
             <Text style={styles.sectionLabel}>Rappels de révision</Text>
             <View style={styles.card}>
-              <Text style={styles.rowLabel}>Budget quotidien</Text>
-              <Text style={styles.rowDesc}>
-                Nombre maximum de chunks à réviser par jour.
-              </Text>
-              <View style={styles.budgetRow}>
-                {[1, 3, 5].map((n) => {
-                  const active = dailyBudget === n;
-                  return (
-                    <Pressable
-                      key={n}
-                      onPress={() => setDailyBudget(n)}
-                      style={[styles.budgetBtn, active && styles.budgetBtnActive]}
-                    >
-                      <Text
-                        style={[
-                          styles.budgetLabel,
-                          active && styles.budgetLabelActive,
-                        ]}
-                      >
-                        {n}
-                      </Text>
-                    </Pressable>
-                  );
-                })}
-              </View>
+              {REMINDER_FIELDS.map((f, i) => (
+                <View
+                  key={f.key}
+                  style={[styles.reminderRow, i > 0 && styles.reminderRowDivider]}
+                >
+                  <Text style={styles.reminderLabel}>{f.label}</Text>
+                  <View style={styles.reminderInputWrap}>
+                    <TextInput
+                      value={String(reminder[f.key])}
+                      onChangeText={(t) => {
+                        const n = Number(t.replace(/[^\d]/g, ''));
+                        if (!Number.isNaN(n)) setReminder(f.key, n);
+                      }}
+                      keyboardType="number-pad"
+                      style={styles.reminderInput}
+                      maxLength={3}
+                    />
+                    <Text style={styles.reminderUnit}>{f.unit}</Text>
+                  </View>
+                </View>
+              ))}
             </View>
           </>
         )}
-      </View>
+      </ScrollView>
     </View>
   );
 }
@@ -162,30 +184,43 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     color: light.textMuted,
   },
-  budgetRow: {
+  reminderRow: {
     flexDirection: 'row',
-    gap: 8,
-    marginTop: 10,
-  },
-  budgetBtn: {
-    flex: 1,
+    justifyContent: 'space-between',
+    alignItems: 'center',
     paddingVertical: 10,
-    borderRadius: 8,
+  },
+  reminderRowDivider: {
+    borderTopWidth: 1,
+    borderTopColor: light.borderMuted,
+  },
+  reminderLabel: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 14,
+    color: light.text,
+  },
+  reminderInputWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
     borderWidth: 1,
     borderColor: light.border,
-    alignItems: 'center',
-    backgroundColor: light.surfaceMuted,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    backgroundColor: light.bg,
   },
-  budgetBtnActive: {
-    borderColor: light.accent,
-    backgroundColor: light.accent,
-  },
-  budgetLabel: {
+  reminderInput: {
     fontFamily: 'Inter_600SemiBold',
     fontSize: 15,
     color: light.text,
+    minWidth: 36,
+    padding: 0,
+    textAlign: 'right',
   },
-  budgetLabelActive: {
-    color: '#FFFFFF',
+  reminderUnit: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 12,
+    color: light.textMuted,
   },
 });

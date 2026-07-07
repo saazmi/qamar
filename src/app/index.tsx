@@ -1,23 +1,22 @@
 // Today screen. SPEC §10.2.
 //
 // Free-mode default: nothing is nudged — just progress stats and a way into
-// the surahs. Guided features (revision reminders, assisted planning) live
-// behind explicit toggles in Settings; when on, they add cards below the
-// stat card.
+// the surahs. Guided features live behind explicit toggles in Settings.
 
 import { Link, useRouter } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { ArrowRight, RefreshCcw, Settings, Sparkles } from 'lucide-react-native';
+import { Settings, Sparkles } from 'lucide-react-native';
+import { AgingSurahList } from '@components/tracking/AgingSurahList';
+import { useAgingSurahs } from '../hooks/useAgingSurahs';
 import { useSurahProgress } from '../hooks/useSurahProgress';
-import { useTodayContext } from '../hooks/useTodayContext';
 import { useSettingsStore } from '@stores/settings';
 import { light } from '@theme/colors';
 
 export default function TodayScreen() {
   const router = useRouter();
   const { overall } = useSurahProgress();
-  const { due } = useTodayContext();
   const features = useSettingsStore((s) => s.features);
+  const aging = useAgingSurahs();
   const pct = Math.round((overall.memorized / overall.total) * 1000) / 10;
 
   return (
@@ -41,35 +40,28 @@ export default function TodayScreen() {
         <Text style={styles.statPct}>{pct.toFixed(1)} %</Text>
       </View>
 
-      {features.revisionReminder && due.length > 0 && (
-        <Link href="/review" asChild>
-          <Pressable style={styles.reviewCard}>
-            <View style={styles.cardHead}>
-              <RefreshCcw size={16} color={light.accent} />
-              <Text style={styles.reviewLabel}>À réviser</Text>
-            </View>
-            <Text style={styles.reviewValue}>
-              {due.length} chunk{due.length > 1 ? 's' : ''}
-            </Text>
-            <View style={styles.cardFoot}>
-              <Text style={styles.cardCta}>Commencer la révision</Text>
-              <ArrowRight size={14} color={light.accent} />
-            </View>
-          </Pressable>
-        </Link>
+      {features.revisionReminder && (
+        <View style={styles.section}>
+          <Text style={styles.sectionLabel}>À réviser</Text>
+          <AgingSurahList items={aging} />
+        </View>
       )}
 
       {features.assistedPlanning && (
-        <View style={styles.card}>
-          <View style={styles.cardHead}>
-            <Sparkles size={16} color={light.accentSecondary} />
-            <Text style={styles.cardLabel}>Planification</Text>
+        <View style={styles.section}>
+          <Text style={styles.sectionLabel}>Planification</Text>
+          <View style={styles.card}>
+            <View style={styles.cardHead}>
+              <Sparkles size={16} color={light.accentSecondary} />
+              <Text style={styles.cardLabel}>À configurer</Text>
+            </View>
+            <Text style={styles.cardTitle}>Répondez à quelques questions</Text>
+            <Text style={styles.cardBody}>
+              Nous générerons un plan personnalisé avec une cadence adaptée et une
+              estimation de temps qui se met à jour selon votre rythme.
+            </Text>
+            <Text style={styles.cardCta}>Bientôt disponible</Text>
           </View>
-          <Text style={styles.cardTitle}>À configurer</Text>
-          <Text style={styles.cardBody}>
-            Répondez à quelques questions pour générer un plan personnalisé.
-          </Text>
-          <Text style={styles.cardCta}>Bientôt disponible</Text>
         </View>
       )}
 
@@ -141,6 +133,16 @@ const styles = StyleSheet.create({
     color: light.accent,
     marginTop: 4,
   },
+  section: {
+    gap: 8,
+  },
+  sectionLabel: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 11,
+    color: light.textMuted,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
   card: {
     backgroundColor: light.surface,
     borderRadius: 12,
@@ -148,14 +150,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: light.border,
     gap: 6,
-  },
-  reviewCard: {
-    backgroundColor: light.state.memorizedBg,
-    borderRadius: 12,
-    padding: 18,
-    borderWidth: 1,
-    borderColor: light.accent,
-    gap: 8,
   },
   cardHead: {
     flexDirection: 'row',
@@ -169,16 +163,9 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
-  reviewLabel: {
-    fontFamily: 'Inter_600SemiBold',
-    fontSize: 11,
-    color: light.accent,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
   cardTitle: {
     fontFamily: 'Inter_600SemiBold',
-    fontSize: 18,
+    fontSize: 16,
     color: light.text,
   },
   cardBody: {
@@ -187,21 +174,11 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     color: light.textMuted,
   },
-  reviewValue: {
-    fontFamily: 'Inter_700Bold',
-    fontSize: 22,
-    color: light.text,
-  },
-  cardFoot: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    marginTop: 4,
-  },
   cardCta: {
     fontFamily: 'Inter_600SemiBold',
     fontSize: 13,
     color: light.accent,
+    marginTop: 4,
   },
   cta: {
     flexDirection: 'row',
