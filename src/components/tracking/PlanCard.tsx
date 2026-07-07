@@ -19,6 +19,7 @@ function formatDate(iso: string): string {
 
 export function PlanCard() {
   const plan = usePlanStore((s) => s.plan);
+  const clearPlan = usePlanStore((s) => s.clearPlan);
   const records = useHifzStore((s) => s.records);
 
   if (!plan) {
@@ -93,6 +94,17 @@ export function PlanCard() {
             : `${drift} jour${drift > 1 ? 's' : ''} au-delà du plan`}
         </Text>
       )}
+
+      <View style={styles.footerRow}>
+        <Link href="/plan/setup" asChild>
+          <Pressable hitSlop={6}>
+            <Text style={styles.footerLink}>Modifier</Text>
+          </Pressable>
+        </Link>
+        <Pressable onPress={() => clearPlan()} hitSlop={6}>
+          <Text style={styles.footerLinkMuted}>Réinitialiser</Text>
+        </Pressable>
+      </View>
     </View>
   );
 }
@@ -187,4 +199,22 @@ const styles = StyleSheet.create({
   },
   etaValue: { fontFamily: 'Inter_600SemiBold', fontSize: 14, color: light.text },
   driftLine: { fontFamily: 'Inter_400Regular', fontSize: 12, color: light.textMuted },
+  footerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 4,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: light.borderMuted,
+  },
+  footerLink: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 12,
+    color: light.accent,
+  },
+  footerLinkMuted: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 12,
+    color: light.textMuted,
+  },
 });
