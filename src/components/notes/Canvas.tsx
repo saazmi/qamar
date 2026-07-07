@@ -32,6 +32,14 @@ export interface CanvasStroke {
   p: [number, number][];
 }
 
+// Persisted format: { ar: aspectRatio (H/W), strokes: [...] }.
+// Legacy notes stored as a bare stroke array parse to default ar = 1.5.
+interface CanvasBody {
+  ar: number;
+  strokes: CanvasStroke[];
+}
+const DEFAULT_AR = CANVAS_INTERNAL_H / CANVAS_INTERNAL_W;
+
 export interface CanvasHandle {
   serialize: () => string;
   clear: () => void;
@@ -45,12 +53,16 @@ interface CanvasProps {
   aspectRatio?: number; // internal H / internal W → display height = width * aspectRatio
 }
 
-function parse(body: string): CanvasStroke[] {
+function parse(body: string): CanvasBody {
   try {
     const v = JSON.parse(body);
-    return Array.isArray(v) ? v : [];
+    if (Array.isArray(v)) return { ar: DEFAULT_AR, strokes: v };
+    if (v && Array.isArray(v.strokes)) {
+      return { ar: typeof v.ar === 'number' ? v.ar : DEFAULT_AR, strokes: v.strokes };
+    }
+    return { ar: DEFAULT_AR, strokes: [] };
   } catch {
-    return [];
+    return { ar: DEFAULT_AR, strokes: [] };
   }
 }
 
@@ -59,7 +71,7 @@ export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas(
     initialStrokes = [],
     color = light.text,
     strokeWidth = 3,
-    aspectRatio = CANVAS_INTERNAL_H / CANVAS_INTERNAL_W,
+    aspectRatio = DEFAULT_AR,
   },
   ref,
 ) {
@@ -122,8 +134,10 @@ export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas(
     [color, strokeWidth],
   );
 
+  const capturedAr = displayW > 0 ? displayH / displayW : aspectRatio;
+
   useImperativeHandle(ref, () => ({
-    serialize: () => JSON.stringify(strokes),
+    serialize: () => JSON.stringify({ ar: capturedAr, strokes }),
     clear: () => setStrokes([]),
     isEmpty: () => strokes.length === 0,
   }));
@@ -192,19 +206,15 @@ export const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas(
 interface CanvasViewProps {
   body: string;
   width?: number;
-  aspectRatio?: number;
+  // aspectRatio prop no longer accepted — the note's saved aspect wins.
 }
 
-export function CanvasView({
-  body,
-  width = 240,
-  aspectRatio = CANVAS_INTERNAL_H / CANVAS_INTERNAL_W,
-}: CanvasViewProps) {
-  const strokes = parse(body);
+export function CanvasView({ body, width = 240 }: CanvasViewProps) {
+  const { ar, strokes } = parse(body);
   return (
     <Svg
       width={width}
-      height={width * aspectRatio}
+      height={width * ar}
       viewBox={`0 0 ${CANVAS_INTERNAL_W} ${CANVAS_INTERNAL_H}`}
       preserveAspectRatio="none"
     >
@@ -225,7 +235,7 @@ export function CanvasView({
 }
 
 export function parseStrokes(body: string): CanvasStroke[] {
-  return parse(body);
+  return parse(body).strokes;
 }
 
 const styles = StyleSheet.create({

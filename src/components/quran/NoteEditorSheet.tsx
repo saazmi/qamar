@@ -13,7 +13,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { Canvas, CanvasView, type CanvasHandle } from '@components/notes/Canvas';
+import { Canvas, CanvasView, parseStrokes, type CanvasHandle } from '@components/notes/Canvas';
 import structure from '@content/structure.json';
 import { loadSurah } from '@content/text';
 import type { AyahText, SurahMeta } from '@content/types';
@@ -191,7 +191,7 @@ export function NoteEditorSheet() {
                         </>
                       ) : (
                         <>
-                          <Canvas ref={editCanvasRef} initialStrokes={parseSafe(n.body)} />
+                          <Canvas ref={editCanvasRef} initialStrokes={parseStrokes(n.body)} />
                           <View style={styles.actionsRow}>
                             <Pressable onPress={() => setEditingId(null)} hitSlop={8}>
                               <Text style={styles.actionMuted}>Annuler</Text>
@@ -274,15 +274,6 @@ export function NoteEditorSheet() {
       </Pressable>
     </Modal>
   );
-}
-
-function parseSafe(body: string): [] {
-  try {
-    const v = JSON.parse(body);
-    return Array.isArray(v) ? (v as []) : [];
-  } catch {
-    return [];
-  }
 }
 
 const styles = StyleSheet.create({
