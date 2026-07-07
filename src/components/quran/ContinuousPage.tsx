@@ -17,7 +17,6 @@ interface Ayah {
 
 interface Props {
   surah: number;
-  page: number;
   ayat: Ayah[];
   fontSize?: number;
   onTap: (surah: number, ayah: number) => void;
@@ -56,7 +55,6 @@ const NO_SELECT = {
 
 export const ContinuousPage = memo(function ContinuousPage({
   surah,
-  page,
   ayat,
   fontSize = 28,
   onTap,
@@ -86,9 +84,6 @@ export const ContinuousPage = memo(function ContinuousPage({
 
   return (
     <View style={styles.page}>
-      <View style={styles.pageHeader}>
-        <Text style={styles.pageLabel}>page {toArabicIndic(page)}</Text>
-      </View>
       <Text
         selectable={false}
         style={[styles.arabic, NO_SELECT, { fontSize, lineHeight: Math.round(fontSize * 1.95) }] as any}
@@ -130,18 +125,6 @@ export const ContinuousPage = memo(function ContinuousPage({
 const styles = StyleSheet.create({
   page: {
     marginBottom: 16,
-  },
-  pageHeader: {
-    alignItems: 'center',
-    marginBottom: 8,
-    opacity: 0.5,
-  },
-  pageLabel: {
-    fontFamily: 'Inter_400Regular',
-    fontSize: 11,
-    color: light.textMuted,
-    textTransform: 'lowercase',
-    letterSpacing: 0.5,
   },
   arabic: {
     fontFamily: 'NotoNaskhArabic_400Regular',
