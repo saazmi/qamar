@@ -11,7 +11,9 @@
       "supportsTablet": true,
       "bundleIdentifier": "app.qamar.hifz",
       "infoPlist": {
-        "UIBackgroundModes": ["audio"]
+        "UIBackgroundModes": [
+          "audio"
+        ]
       }
     },
     "android": {
@@ -24,7 +26,8 @@
       "expo-router",
       "expo-font",
       "expo-sqlite",
-      "expo-av"
+      "expo-av",
+      "expo-status-bar"
     ],
     "experiments": {
       "typedRoutes": true

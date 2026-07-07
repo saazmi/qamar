@@ -2,8 +2,7 @@
   {
     "id": 1,
     "nameArabic": "سُورَةُ ٱلْفَاتِحَةِ",
-    "nameTransliterated": "Al-Faatiha",
-    "nameFrench": "L'ouverture",
+    "nameTransliterated": "Al-Fatiha",
     "ayahCount": 7,
     "revelationPlace": "makkah"
   },
@@ -11,55 +10,48 @@
     "id": 2,
     "nameArabic": "سُورَةُ البَقَرَةِ",
     "nameTransliterated": "Al-Baqara",
-    "nameFrench": "La Vache",
     "ayahCount": 286,
     "revelationPlace": "madinah"
   },
   {
     "id": 3,
     "nameArabic": "سُورَةُ آلِ عِمۡرَانَ",
-    "nameTransliterated": "Aal-i-Imraan",
-    "nameFrench": "La Famille d'Imran",
+    "nameTransliterated": "Al-Imran",
     "ayahCount": 200,
     "revelationPlace": "madinah"
   },
   {
     "id": 4,
     "nameArabic": "سُورَةُ النِّسَاءِ",
-    "nameTransliterated": "An-Nisaa",
-    "nameFrench": "Les Femmes",
+    "nameTransliterated": "An-Nisa",
     "ayahCount": 176,
     "revelationPlace": "madinah"
   },
   {
     "id": 5,
     "nameArabic": "سُورَةُ المَائـِدَةِ",
-    "nameTransliterated": "Al-Maaida",
-    "nameFrench": "La Table servie",
+    "nameTransliterated": "Al-Ma'ida",
     "ayahCount": 120,
     "revelationPlace": "madinah"
   },
   {
     "id": 6,
     "nameArabic": "سُورَةُ الأَنۡعَامِ",
-    "nameTransliterated": "Al-An'aam",
-    "nameFrench": "Les Bestiaux",
+    "nameTransliterated": "Al-An'am",
     "ayahCount": 165,
     "revelationPlace": "makkah"
   },
   {
     "id": 7,
     "nameArabic": "سُورَةُ الأَعۡرَافِ",
-    "nameTransliterated": "Al-A'raaf",
-    "nameFrench": "Al-A`raf",
+    "nameTransliterated": "Al-A'raf",
     "ayahCount": 206,
     "revelationPlace": "makkah"
   },
   {
     "id": 8,
     "nameArabic": "سُورَةُ الأَنفَالِ",
-    "nameTransliterated": "Al-Anfaal",
-    "nameFrench": "Le Butin",
+    "nameTransliterated": "Al-Anfal",
     "ayahCount": 75,
     "revelationPlace": "madinah"
   },
@@ -67,7 +59,6 @@
     "id": 9,
     "nameArabic": "سُورَةُ التَّوۡبَةِ",
     "nameTransliterated": "At-Tawba",
-    "nameFrench": "Le Repentir",
     "ayahCount": 129,
     "revelationPlace": "madinah"
   },
@@ -75,7 +66,6 @@
     "id": 10,
     "nameArabic": "سُورَةُ يُونُسَ",
     "nameTransliterated": "Yunus",
-    "nameFrench": "Yunus",
     "ayahCount": 109,
     "revelationPlace": "makkah"
   },
@@ -83,7 +73,6 @@
     "id": 11,
     "nameArabic": "سُورَةُ هُودٍ",
     "nameTransliterated": "Hud",
-    "nameFrench": "Hud",
     "ayahCount": 123,
     "revelationPlace": "makkah"
   },
@@ -91,7 +80,6 @@
     "id": 12,
     "nameArabic": "سُورَةُ يُوسُفَ",
     "nameTransliterated": "Yusuf",
-    "nameFrench": "Joseph",
     "ayahCount": 111,
     "revelationPlace": "makkah"
   },
@@ -99,7 +87,6 @@
     "id": 13,
     "nameArabic": "سُورَةُ الرَّعۡدِ",
     "nameTransliterated": "Ar-Ra'd",
-    "nameFrench": "Le Tonnerre",
     "ayahCount": 43,
     "revelationPlace": "madinah"
   },
@@ -107,7 +94,6 @@
     "id": 14,
     "nameArabic": "سُورَةُ إِبۡرَاهِيمَ",
     "nameTransliterated": "Ibrahim",
-    "nameFrench": "Abraham",
     "ayahCount": 52,
     "revelationPlace": "makkah"
   },
@@ -115,7 +101,6 @@
     "id": 15,
     "nameArabic": "سُورَةُ الحِجۡرِ",
     "nameTransliterated": "Al-Hijr",
-    "nameFrench": "Al-Hijr",
     "ayahCount": 99,
     "revelationPlace": "makkah"
   },
@@ -123,15 +108,13 @@
     "id": 16,
     "nameArabic": "سُورَةُ النَّحۡلِ",
     "nameTransliterated": "An-Nahl",
-    "nameFrench": "Les Abeilles",
     "ayahCount": 128,
     "revelationPlace": "makkah"
   },
   {
     "id": 17,
     "nameArabic": "سُورَةُ الإِسۡرَاءِ",
-    "nameTransliterated": "Al-Israa",
-    "nameFrench": "Le Voyage nocturne",
+    "nameTransliterated": "Al-Isra",
     "ayahCount": 111,
     "revelationPlace": "makkah"
   },
@@ -139,7 +122,6 @@
     "id": 18,
     "nameArabic": "سُورَةُ الكَهۡفِ",
     "nameTransliterated": "Al-Kahf",
-    "nameFrench": "La Caverne",
     "ayahCount": 110,
     "revelationPlace": "makkah"
   },
@@ -147,23 +129,20 @@
     "id": 19,
     "nameArabic": "سُورَةُ مَرۡيَمَ",
     "nameTransliterated": "Maryam",
-    "nameFrench": "Marie",
     "ayahCount": 98,
     "revelationPlace": "makkah"
   },
   {
     "id": 20,
     "nameArabic": "سُورَةُ طه",
-    "nameTransliterated": "Taa-Haa",
-    "nameFrench": "Ta-Ha",
+    "nameTransliterated": "Ta-Ha",
     "ayahCount": 135,
     "revelationPlace": "makkah"
   },
   {
     "id": 21,
     "nameArabic": "سُورَةُ الأَنبِيَاءِ",
-    "nameTransliterated": "Al-Anbiyaa",
-    "nameFrench": "Les Prophètes",
+    "nameTransliterated": "Al-Anbiya",
     "ayahCount": 112,
     "revelationPlace": "makkah"
   },
@@ -171,39 +150,34 @@
     "id": 22,
     "nameArabic": "سُورَةُ الحَجِّ",
     "nameTransliterated": "Al-Hajj",
-    "nameFrench": "Le Pèlerinage",
     "ayahCount": 78,
     "revelationPlace": "madinah"
   },
   {
     "id": 23,
     "nameArabic": "سُورَةُ المُؤۡمِنُونَ",
-    "nameTransliterated": "Al-Muminoon",
-    "nameFrench": "Les Croyants",
+    "nameTransliterated": "Al-Mu'minun",
     "ayahCount": 118,
     "revelationPlace": "makkah"
   },
   {
     "id": 24,
     "nameArabic": "سُورَةُ النُّورِ",
-    "nameTransliterated": "An-Noor",
-    "nameFrench": "La Lumière",
+    "nameTransliterated": "An-Nur",
     "ayahCount": 64,
     "revelationPlace": "madinah"
   },
   {
     "id": 25,
     "nameArabic": "سُورَةُ الفُرۡقَانِ",
-    "nameTransliterated": "Al-Furqaan",
-    "nameFrench": "Le Discernement",
+    "nameTransliterated": "Al-Furqan",
     "ayahCount": 77,
     "revelationPlace": "makkah"
   },
   {
     "id": 26,
     "nameArabic": "سُورَةُ الشُّعَرَاءِ",
-    "nameTransliterated": "Ash-Shu'araa",
-    "nameFrench": "Les Poètes",
+    "nameTransliterated": "Ash-Shu'ara",
     "ayahCount": 227,
     "revelationPlace": "makkah"
   },
@@ -211,7 +185,6 @@
     "id": 27,
     "nameArabic": "سُورَةُ النَّمۡلِ",
     "nameTransliterated": "An-Naml",
-    "nameFrench": "Les Fourmis",
     "ayahCount": 93,
     "revelationPlace": "makkah"
   },
@@ -219,23 +192,20 @@
     "id": 28,
     "nameArabic": "سُورَةُ القَصَصِ",
     "nameTransliterated": "Al-Qasas",
-    "nameFrench": "Le Récit",
     "ayahCount": 88,
     "revelationPlace": "makkah"
   },
   {
     "id": 29,
     "nameArabic": "سُورَةُ العَنكَبُوتِ",
-    "nameTransliterated": "Al-Ankaboot",
-    "nameFrench": "L'Araignée",
+    "nameTransliterated": "Al-'Ankabut",
     "ayahCount": 69,
     "revelationPlace": "makkah"
   },
   {
     "id": 30,
     "nameArabic": "سُورَةُ الرُّومِ",
-    "nameTransliterated": "Ar-Room",
-    "nameFrench": "Les Romains",
+    "nameTransliterated": "Ar-Rum",
     "ayahCount": 60,
     "revelationPlace": "makkah"
   },
@@ -243,7 +213,6 @@
     "id": 31,
     "nameArabic": "سُورَةُ لُقۡمَانَ",
     "nameTransliterated": "Luqman",
-    "nameFrench": "Luqman",
     "ayahCount": 34,
     "revelationPlace": "makkah"
   },
@@ -251,15 +220,13 @@
     "id": 32,
     "nameArabic": "سُورَةُ السَّجۡدَةِ",
     "nameTransliterated": "As-Sajda",
-    "nameFrench": "La Prosternation",
     "ayahCount": 30,
     "revelationPlace": "makkah"
   },
   {
     "id": 33,
     "nameArabic": "سُورَةُ الأَحۡزَابِ",
-    "nameTransliterated": "Al-Ahzaab",
-    "nameFrench": "Les Coalisés",
+    "nameTransliterated": "Al-Ahzab",
     "ayahCount": 73,
     "revelationPlace": "madinah"
   },
@@ -267,39 +234,34 @@
     "id": 34,
     "nameArabic": "سُورَةُ سَبَإٍ",
     "nameTransliterated": "Saba",
-    "nameFrench": "Saba'",
     "ayahCount": 54,
     "revelationPlace": "makkah"
   },
   {
     "id": 35,
     "nameArabic": "سُورَةُ فَاطِرٍ",
-    "nameTransliterated": "Faatir",
-    "nameFrench": "Le Créateur",
+    "nameTransliterated": "Fatir",
     "ayahCount": 45,
     "revelationPlace": "makkah"
   },
   {
     "id": 36,
     "nameArabic": "سُورَةُ يسٓ",
-    "nameTransliterated": "Yaseen",
-    "nameFrench": "Ya-Sin",
+    "nameTransliterated": "Ya-Sin",
     "ayahCount": 83,
     "revelationPlace": "makkah"
   },
   {
     "id": 37,
     "nameArabic": "سُورَةُ الصَّافَّاتِ",
-    "nameTransliterated": "As-Saaffaat",
-    "nameFrench": "Les Rangés",
+    "nameTransliterated": "As-Saffat",
     "ayahCount": 182,
     "revelationPlace": "makkah"
   },
   {
     "id": 38,
     "nameArabic": "سُورَةُ صٓ",
-    "nameTransliterated": "Saad",
-    "nameFrench": "Sad",
+    "nameTransliterated": "Sad",
     "ayahCount": 88,
     "revelationPlace": "makkah"
   },
@@ -307,7 +269,6 @@
     "id": 39,
     "nameArabic": "سُورَةُ الزُّمَرِ",
     "nameTransliterated": "Az-Zumar",
-    "nameFrench": "Les Groupes",
     "ayahCount": 75,
     "revelationPlace": "makkah"
   },
@@ -315,7 +276,6 @@
     "id": 40,
     "nameArabic": "سُورَةُ غَافِرٍ",
     "nameTransliterated": "Ghafir",
-    "nameFrench": "Le Pardonneur",
     "ayahCount": 85,
     "revelationPlace": "makkah"
   },
@@ -323,7 +283,6 @@
     "id": 41,
     "nameArabic": "سُورَةُ فُصِّلَتۡ",
     "nameTransliterated": "Fussilat",
-    "nameFrench": "Les Versets détaillés",
     "ayahCount": 54,
     "revelationPlace": "makkah"
   },
@@ -331,7 +290,6 @@
     "id": 42,
     "nameArabic": "سُورَةُ الشُّورَىٰ",
     "nameTransliterated": "Ash-Shura",
-    "nameFrench": "La Consultation",
     "ayahCount": 53,
     "revelationPlace": "makkah"
   },
@@ -339,23 +297,20 @@
     "id": 43,
     "nameArabic": "سُورَةُ الزُّخۡرُفِ",
     "nameTransliterated": "Az-Zukhruf",
-    "nameFrench": "L'Ornement",
     "ayahCount": 89,
     "revelationPlace": "makkah"
   },
   {
     "id": 44,
     "nameArabic": "سُورَةُ الدُّخَانِ",
-    "nameTransliterated": "Ad-Dukhaan",
-    "nameFrench": "La Fumée",
+    "nameTransliterated": "Ad-Dukhan",
     "ayahCount": 59,
     "revelationPlace": "makkah"
   },
   {
     "id": 45,
     "nameArabic": "سُورَةُ الجَاثِيَةِ",
-    "nameTransliterated": "Al-Jaathiya",
-    "nameFrench": "L'Agenouillée",
+    "nameTransliterated": "Al-Jathiya",
     "ayahCount": 37,
     "revelationPlace": "makkah"
   },
@@ -363,7 +318,6 @@
     "id": 46,
     "nameArabic": "سُورَةُ الأَحۡقَافِ",
     "nameTransliterated": "Al-Ahqaf",
-    "nameFrench": "Al-Ahqaf",
     "ayahCount": 35,
     "revelationPlace": "makkah"
   },
@@ -371,7 +325,6 @@
     "id": 47,
     "nameArabic": "سُورَةُ مُحَمَّدٍ",
     "nameTransliterated": "Muhammad",
-    "nameFrench": "Muhammad",
     "ayahCount": 38,
     "revelationPlace": "madinah"
   },
@@ -379,31 +332,27 @@
     "id": 48,
     "nameArabic": "سُورَةُ الفَتۡحِ",
     "nameTransliterated": "Al-Fath",
-    "nameFrench": "La Victoire éclatante",
     "ayahCount": 29,
     "revelationPlace": "madinah"
   },
   {
     "id": 49,
     "nameArabic": "سُورَةُ الحُجُرَاتِ",
-    "nameTransliterated": "Al-Hujuraat",
-    "nameFrench": "Les Appartements",
+    "nameTransliterated": "Al-Hujurat",
     "ayahCount": 18,
     "revelationPlace": "madinah"
   },
   {
     "id": 50,
     "nameArabic": "سُورَةُ قٓ",
-    "nameTransliterated": "Qaaf",
-    "nameFrench": "Qaf",
+    "nameTransliterated": "Qaf",
     "ayahCount": 45,
     "revelationPlace": "makkah"
   },
   {
     "id": 51,
     "nameArabic": "سُورَةُ الذَّارِيَاتِ",
-    "nameTransliterated": "Adh-Dhaariyat",
-    "nameFrench": "Qui éparpillent",
+    "nameTransliterated": "Adh-Dhariyat",
     "ayahCount": 60,
     "revelationPlace": "makkah"
   },
@@ -411,7 +360,6 @@
     "id": 52,
     "nameArabic": "سُورَةُ الطُّورِ",
     "nameTransliterated": "At-Tur",
-    "nameFrench": "At-Tur",
     "ayahCount": 49,
     "revelationPlace": "makkah"
   },
@@ -419,7 +367,6 @@
     "id": 53,
     "nameArabic": "سُورَةُ النَّجۡمِ",
     "nameTransliterated": "An-Najm",
-    "nameFrench": "L'Étoile",
     "ayahCount": 62,
     "revelationPlace": "makkah"
   },
@@ -427,23 +374,20 @@
     "id": 54,
     "nameArabic": "سُورَةُ القَمَرِ",
     "nameTransliterated": "Al-Qamar",
-    "nameFrench": "La Lune",
     "ayahCount": 55,
     "revelationPlace": "makkah"
   },
   {
     "id": 55,
     "nameArabic": "سُورَةُ الرَّحۡمَٰن",
-    "nameTransliterated": "Ar-Rahmaan",
-    "nameFrench": "Le Tout Miséricordieux",
+    "nameTransliterated": "Ar-Rahman",
     "ayahCount": 78,
     "revelationPlace": "madinah"
   },
   {
     "id": 56,
     "nameArabic": "سُورَةُ الوَاقِعَةِ",
-    "nameTransliterated": "Al-Waaqia",
-    "nameFrench": "L'Événement",
+    "nameTransliterated": "Al-Waqi'a",
     "ayahCount": 96,
     "revelationPlace": "makkah"
   },
@@ -451,15 +395,13 @@
     "id": 57,
     "nameArabic": "سُورَةُ الحَدِيدِ",
     "nameTransliterated": "Al-Hadid",
-    "nameFrench": "Le Fer",
     "ayahCount": 29,
     "revelationPlace": "madinah"
   },
   {
     "id": 58,
     "nameArabic": "سُورَةُ المُجَادلَةِ",
-    "nameTransliterated": "Al-Mujaadila",
-    "nameFrench": "La Discussion",
+    "nameTransliterated": "Al-Mujadila",
     "ayahCount": 22,
     "revelationPlace": "madinah"
   },
@@ -467,7 +409,6 @@
     "id": 59,
     "nameArabic": "سُورَةُ الحَشۡرِ",
     "nameTransliterated": "Al-Hashr",
-    "nameFrench": "L'Exode",
     "ayahCount": 24,
     "revelationPlace": "madinah"
   },
@@ -475,7 +416,6 @@
     "id": 60,
     "nameArabic": "سُورَةُ المُمۡتَحنَةِ",
     "nameTransliterated": "Al-Mumtahana",
-    "nameFrench": "L'Éprouvée",
     "ayahCount": 13,
     "revelationPlace": "madinah"
   },
@@ -483,7 +423,6 @@
     "id": 61,
     "nameArabic": "سُورَةُ الصَّفِّ",
     "nameTransliterated": "As-Saff",
-    "nameFrench": "Le Rang",
     "ayahCount": 14,
     "revelationPlace": "madinah"
   },
@@ -491,31 +430,27 @@
     "id": 62,
     "nameArabic": "سُورَةُ الجُمُعَةِ",
     "nameTransliterated": "Al-Jumu'a",
-    "nameFrench": "Le Vendredi",
     "ayahCount": 11,
     "revelationPlace": "madinah"
   },
   {
     "id": 63,
     "nameArabic": "سُورَةُ المُنَافِقُونَ",
-    "nameTransliterated": "Al-Munaafiqoon",
-    "nameFrench": "Les Hypocrites",
+    "nameTransliterated": "Al-Munafiqun",
     "ayahCount": 11,
     "revelationPlace": "madinah"
   },
   {
     "id": 64,
     "nameArabic": "سُورَةُ التَّغَابُنِ",
-    "nameTransliterated": "At-Taghaabun",
-    "nameFrench": "La Grande Perte",
+    "nameTransliterated": "At-Taghabun",
     "ayahCount": 18,
     "revelationPlace": "madinah"
   },
   {
     "id": 65,
     "nameArabic": "سُورَةُ الطَّلَاقِ",
-    "nameTransliterated": "At-Talaaq",
-    "nameFrench": "Le Divorce",
+    "nameTransliterated": "At-Talaq",
     "ayahCount": 12,
     "revelationPlace": "madinah"
   },
@@ -523,7 +458,6 @@
     "id": 66,
     "nameArabic": "سُورَةُ التَّحۡرِيمِ",
     "nameTransliterated": "At-Tahrim",
-    "nameFrench": "L'Interdiction",
     "ayahCount": 12,
     "revelationPlace": "madinah"
   },
@@ -531,7 +465,6 @@
     "id": 67,
     "nameArabic": "سُورَةُ المُلۡكِ",
     "nameTransliterated": "Al-Mulk",
-    "nameFrench": "La Royauté",
     "ayahCount": 30,
     "revelationPlace": "makkah"
   },
@@ -539,31 +472,27 @@
     "id": 68,
     "nameArabic": "سُورَةُ القَلَمِ",
     "nameTransliterated": "Al-Qalam",
-    "nameFrench": "La Plume",
     "ayahCount": 52,
     "revelationPlace": "makkah"
   },
   {
     "id": 69,
     "nameArabic": "سُورَةُ الحَاقَّةِ",
-    "nameTransliterated": "Al-Haaqqa",
-    "nameFrench": "Celle qui montre la vérité",
+    "nameTransliterated": "Al-Haqqa",
     "ayahCount": 52,
     "revelationPlace": "makkah"
   },
   {
     "id": 70,
     "nameArabic": "سُورَةُ المَعَارِجِ",
-    "nameTransliterated": "Al-Ma'aarij",
-    "nameFrench": "Les Voies d'Ascension",
+    "nameTransliterated": "Al-Ma'arij",
     "ayahCount": 44,
     "revelationPlace": "makkah"
   },
   {
     "id": 71,
     "nameArabic": "سُورَةُ نُوحٍ",
-    "nameTransliterated": "Nooh",
-    "nameFrench": "Nuh",
+    "nameTransliterated": "Nuh",
     "ayahCount": 28,
     "revelationPlace": "makkah"
   },
@@ -571,7 +500,6 @@
     "id": 72,
     "nameArabic": "سُورَةُ الجِنِّ",
     "nameTransliterated": "Al-Jinn",
-    "nameFrench": "Les Djinns",
     "ayahCount": 28,
     "revelationPlace": "makkah"
   },
@@ -579,39 +507,34 @@
     "id": 73,
     "nameArabic": "سُورَةُ المُزَّمِّلِ",
     "nameTransliterated": "Al-Muzzammil",
-    "nameFrench": "L'Enveloppé",
     "ayahCount": 20,
     "revelationPlace": "makkah"
   },
   {
     "id": 74,
     "nameArabic": "سُورَةُ المُدَّثِّرِ",
-    "nameTransliterated": "Al-Muddaththir",
-    "nameFrench": "Le Revêtu d'un manteau",
+    "nameTransliterated": "Al-Muddathir",
     "ayahCount": 56,
     "revelationPlace": "makkah"
   },
   {
     "id": 75,
     "nameArabic": "سُورَةُ القِيَامَةِ",
-    "nameTransliterated": "Al-Qiyaama",
-    "nameFrench": "La Résurrection",
+    "nameTransliterated": "Al-Qiyama",
     "ayahCount": 40,
     "revelationPlace": "makkah"
   },
   {
     "id": 76,
     "nameArabic": "سُورَةُ الإِنسَانِ",
-    "nameTransliterated": "Al-Insaan",
-    "nameFrench": "L'Homme",
+    "nameTransliterated": "Al-Insan",
     "ayahCount": 31,
     "revelationPlace": "madinah"
   },
   {
     "id": 77,
     "nameArabic": "سُورَةُ المُرۡسَلَاتِ",
-    "nameTransliterated": "Al-Mursalaat",
-    "nameFrench": "Les Envoyés",
+    "nameTransliterated": "Al-Mursalat",
     "ayahCount": 50,
     "revelationPlace": "makkah"
   },
@@ -619,23 +542,20 @@
     "id": 78,
     "nameArabic": "سُورَةُ النَّبَإِ",
     "nameTransliterated": "An-Naba",
-    "nameFrench": "La Nouvelle",
     "ayahCount": 40,
     "revelationPlace": "makkah"
   },
   {
     "id": 79,
     "nameArabic": "سُورَةُ النَّازِعَاتِ",
-    "nameTransliterated": "An-Naazi'aat",
-    "nameFrench": "Les Anges qui arrachent les âmes",
+    "nameTransliterated": "An-Nazi'at",
     "ayahCount": 46,
     "revelationPlace": "makkah"
   },
   {
     "id": 80,
     "nameArabic": "سُورَةُ عَبَسَ",
-    "nameTransliterated": "Abasa",
-    "nameFrench": "'Abasa",
+    "nameTransliterated": "'Abasa",
     "ayahCount": 42,
     "revelationPlace": "makkah"
   },
@@ -643,15 +563,13 @@
     "id": 81,
     "nameArabic": "سُورَةُ التَّكۡوِيرِ",
     "nameTransliterated": "At-Takwir",
-    "nameFrench": "L'Obscurcissement",
     "ayahCount": 29,
     "revelationPlace": "makkah"
   },
   {
     "id": 82,
     "nameArabic": "سُورَةُ الانفِطَارِ",
-    "nameTransliterated": "Al-Infitaar",
-    "nameFrench": "La Rupture",
+    "nameTransliterated": "Al-Infitar",
     "ayahCount": 19,
     "revelationPlace": "makkah"
   },
@@ -659,47 +577,41 @@
     "id": 83,
     "nameArabic": "سُورَةُ المُطَفِّفِينَ",
     "nameTransliterated": "Al-Mutaffifin",
-    "nameFrench": "Les Fraudeurs",
     "ayahCount": 36,
     "revelationPlace": "makkah"
   },
   {
     "id": 84,
     "nameArabic": "سُورَةُ الانشِقَاقِ",
-    "nameTransliterated": "Al-Inshiqaaq",
-    "nameFrench": "La Déchirure",
+    "nameTransliterated": "Al-Inshiqaq",
     "ayahCount": 25,
     "revelationPlace": "makkah"
   },
   {
     "id": 85,
     "nameArabic": "سُورَةُ البُرُوجِ",
-    "nameTransliterated": "Al-Burooj",
-    "nameFrench": "Les Constellations",
+    "nameTransliterated": "Al-Buruj",
     "ayahCount": 22,
     "revelationPlace": "makkah"
   },
   {
     "id": 86,
     "nameArabic": "سُورَةُ الطَّارِقِ",
-    "nameTransliterated": "At-Taariq",
-    "nameFrench": "L'Astre nocturne",
+    "nameTransliterated": "At-Tariq",
     "ayahCount": 17,
     "revelationPlace": "makkah"
   },
   {
     "id": 87,
     "nameArabic": "سُورَةُ الأَعۡلَىٰ",
-    "nameTransliterated": "Al-A'laa",
-    "nameFrench": "Le Très-Haut",
+    "nameTransliterated": "Al-A'la",
     "ayahCount": 19,
     "revelationPlace": "makkah"
   },
   {
     "id": 88,
     "nameArabic": "سُورَةُ الغَاشِيَةِ",
-    "nameTransliterated": "Al-Ghaashiya",
-    "nameFrench": "L'Enveloppante",
+    "nameTransliterated": "Al-Ghashiya",
     "ayahCount": 26,
     "revelationPlace": "makkah"
   },
@@ -707,7 +619,6 @@
     "id": 89,
     "nameArabic": "سُورَةُ الفَجۡرِ",
     "nameTransliterated": "Al-Fajr",
-    "nameFrench": "L'Aube",
     "ayahCount": 30,
     "revelationPlace": "makkah"
   },
@@ -715,7 +626,6 @@
     "id": 90,
     "nameArabic": "سُورَةُ البَلَدِ",
     "nameTransliterated": "Al-Balad",
-    "nameFrench": "La Cité",
     "ayahCount": 20,
     "revelationPlace": "makkah"
   },
@@ -723,23 +633,20 @@
     "id": 91,
     "nameArabic": "سُورَةُ الشَّمۡسِ",
     "nameTransliterated": "Ash-Shams",
-    "nameFrench": "Le Soleil",
     "ayahCount": 15,
     "revelationPlace": "makkah"
   },
   {
     "id": 92,
     "nameArabic": "سُورَةُ اللَّيۡلِ",
-    "nameTransliterated": "Al-Lail",
-    "nameFrench": "La Nuit",
+    "nameTransliterated": "Al-Layl",
     "ayahCount": 21,
     "revelationPlace": "makkah"
   },
   {
     "id": 93,
     "nameArabic": "سُورَةُ الضُّحَىٰ",
-    "nameTransliterated": "Ad-Dhuhaa",
-    "nameFrench": "Le Jour Montant",
+    "nameTransliterated": "Ad-Duha",
     "ayahCount": 11,
     "revelationPlace": "makkah"
   },
@@ -747,7 +654,6 @@
     "id": 94,
     "nameArabic": "سُورَةُ الشَّرۡحِ",
     "nameTransliterated": "Ash-Sharh",
-    "nameFrench": "L'Ouverture",
     "ayahCount": 8,
     "revelationPlace": "makkah"
   },
@@ -755,15 +661,13 @@
     "id": 95,
     "nameArabic": "سُورَةُ التِّينِ",
     "nameTransliterated": "At-Tin",
-    "nameFrench": "Le Figuier",
     "ayahCount": 8,
     "revelationPlace": "makkah"
   },
   {
     "id": 96,
     "nameArabic": "سُورَةُ العَلَقِ",
-    "nameTransliterated": "Al-Alaq",
-    "nameFrench": "L'Adhérence",
+    "nameTransliterated": "Al-'Alaq",
     "ayahCount": 19,
     "revelationPlace": "makkah"
   },
@@ -771,7 +675,6 @@
     "id": 97,
     "nameArabic": "سُورَةُ القَدۡرِ",
     "nameTransliterated": "Al-Qadr",
-    "nameFrench": "La Destinée",
     "ayahCount": 5,
     "revelationPlace": "makkah"
   },
@@ -779,7 +682,6 @@
     "id": 98,
     "nameArabic": "سُورَةُ البَيِّنَةِ",
     "nameTransliterated": "Al-Bayyina",
-    "nameFrench": "La Preuve",
     "ayahCount": 8,
     "revelationPlace": "madinah"
   },
@@ -787,39 +689,34 @@
     "id": 99,
     "nameArabic": "سُورَةُ الزَّلۡزَلَةِ",
     "nameTransliterated": "Az-Zalzala",
-    "nameFrench": "La Secousse",
     "ayahCount": 8,
     "revelationPlace": "madinah"
   },
   {
     "id": 100,
     "nameArabic": "سُورَةُ العَادِيَاتِ",
-    "nameTransliterated": "Al-Aadiyaat",
-    "nameFrench": "Les Coursiers",
+    "nameTransliterated": "Al-'Adiyat",
     "ayahCount": 11,
     "revelationPlace": "makkah"
   },
   {
     "id": 101,
     "nameArabic": "سُورَةُ القَارِعَةِ",
-    "nameTransliterated": "Al-Qaari'a",
-    "nameFrench": "Le Fracas",
+    "nameTransliterated": "Al-Qari'a",
     "ayahCount": 11,
     "revelationPlace": "makkah"
   },
   {
     "id": 102,
     "nameArabic": "سُورَةُ التَّكَاثُرِ",
-    "nameTransliterated": "At-Takaathur",
-    "nameFrench": "La Course aux richesses",
+    "nameTransliterated": "At-Takathur",
     "ayahCount": 8,
     "revelationPlace": "makkah"
   },
   {
     "id": 103,
     "nameArabic": "سُورَةُ العَصۡرِ",
-    "nameTransliterated": "Al-Asr",
-    "nameFrench": "Le Temps",
+    "nameTransliterated": "Al-'Asr",
     "ayahCount": 3,
     "revelationPlace": "makkah"
   },
@@ -827,7 +724,6 @@
     "id": 104,
     "nameArabic": "سُورَةُ الهُمَزَةِ",
     "nameTransliterated": "Al-Humaza",
-    "nameFrench": "Les Calomniateurs",
     "ayahCount": 9,
     "revelationPlace": "makkah"
   },
@@ -835,23 +731,20 @@
     "id": 105,
     "nameArabic": "سُورَةُ الفِيلِ",
     "nameTransliterated": "Al-Fil",
-    "nameFrench": "L'Éléphant",
     "ayahCount": 5,
     "revelationPlace": "makkah"
   },
   {
     "id": 106,
     "nameArabic": "سُورَةُ قُرَيۡشٍ",
-    "nameTransliterated": "Quraish",
-    "nameFrench": "Quraysh",
+    "nameTransliterated": "Quraysh",
     "ayahCount": 4,
     "revelationPlace": "makkah"
   },
   {
     "id": 107,
     "nameArabic": "سُورَةُ المَاعُونِ",
-    "nameTransliterated": "Al-Maa'un",
-    "nameFrench": "L'Ustensile",
+    "nameTransliterated": "Al-Ma'un",
     "ayahCount": 7,
     "revelationPlace": "makkah"
   },
@@ -859,15 +752,13 @@
     "id": 108,
     "nameArabic": "سُورَةُ الكَوۡثَرِ",
     "nameTransliterated": "Al-Kawthar",
-    "nameFrench": "L'Abondance",
     "ayahCount": 3,
     "revelationPlace": "makkah"
   },
   {
     "id": 109,
     "nameArabic": "سُورَةُ الكَافِرُونَ",
-    "nameTransliterated": "Al-Kaafiroon",
-    "nameFrench": "Les Infidèles",
+    "nameTransliterated": "Al-Kafirun",
     "ayahCount": 6,
     "revelationPlace": "makkah"
   },
@@ -875,7 +766,6 @@
     "id": 110,
     "nameArabic": "سُورَةُ النَّصۡرِ",
     "nameTransliterated": "An-Nasr",
-    "nameFrench": "Les Secours",
     "ayahCount": 3,
     "revelationPlace": "madinah"
   },
@@ -883,15 +773,13 @@
     "id": 111,
     "nameArabic": "سُورَةُ المَسَدِ",
     "nameTransliterated": "Al-Masad",
-    "nameFrench": "Les Fibres",
     "ayahCount": 5,
     "revelationPlace": "makkah"
   },
   {
     "id": 112,
     "nameArabic": "سُورَةُ الإِخۡلَاصِ",
-    "nameTransliterated": "Al-Ikhlaas",
-    "nameFrench": "Le Monothéisme pur",
+    "nameTransliterated": "Al-Ikhlas",
     "ayahCount": 4,
     "revelationPlace": "makkah"
   },
@@ -899,15 +787,13 @@
     "id": 113,
     "nameArabic": "سُورَةُ الفَلَقِ",
     "nameTransliterated": "Al-Falaq",
-    "nameFrench": "L'Aube naissante",
     "ayahCount": 5,
     "revelationPlace": "makkah"
   },
   {
     "id": 114,
     "nameArabic": "سُورَةُ النَّاسِ",
-    "nameTransliterated": "An-Naas",
-    "nameFrench": "Les Hommes",
+    "nameTransliterated": "An-Nas",
     "ayahCount": 6,
     "revelationPlace": "makkah"
   }

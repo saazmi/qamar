@@ -52,7 +52,7 @@ export default function ReadingViewScreen() {
         <View style={styles.headerTitles}>
           <Text style={styles.arabicName}>{surahMeta.nameArabic}</Text>
           <Text style={styles.frenchName}>
-            {surahMeta.nameFrench} · {surahMeta.ayahCount} versets
+            {surahMeta.nameTransliterated} · {surahMeta.ayahCount} versets
           </Text>
         </View>
         <Pressable onPress={() => setShowFrench((v) => !v)} hitSlop={12}>

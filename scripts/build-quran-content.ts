@@ -14,7 +14,7 @@ const __dirname = path.dirname(__filename);
 const ROOT = path.resolve(__dirname, '..');
 const CACHE_DIR = path.join(ROOT, 'scripts', '.cache');
 const OUT_DIR = path.join(ROOT, 'src', 'content');
-const FR_NAMES_PATH = path.join(ROOT, 'scripts', 'data', 'surahs-fr.json');
+const NAMES_PATH = path.join(ROOT, 'scripts', 'data', 'surahs-transliterated.json');
 
 const EDITIONS = {
   arabic: 'quran-simple', // Tanzil Imlaei simple with tashkeel (harakat)
@@ -85,14 +85,13 @@ async function main(): Promise<void> {
     cachedFetch(`${EDITIONS.french}.json`, `${API_BASE}/quran/${EDITIONS.french}`),
   ]);
 
-  const frNamesRaw = await fs.readFile(FR_NAMES_PATH, 'utf8');
-  const frNames = JSON.parse(frNamesRaw) as Record<string, string>;
+  const translitRaw = await fs.readFile(NAMES_PATH, 'utf8');
+  const translit = JSON.parse(translitRaw) as Record<string, string>;
 
   const structure = arabic.data.surahs.map((s) => ({
     id: s.number,
     nameArabic: s.name,
-    nameTransliterated: s.englishName,
-    nameFrench: frNames[String(s.number)] ?? s.englishName,
+    nameTransliterated: translit[String(s.number)] ?? s.englishName,
     ayahCount: s.ayahs.length,
     revelationPlace: normalizeRevelation(s.revelationType),
   }));

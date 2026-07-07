@@ -8,7 +8,6 @@ export interface SurahMeta {
   id: number;
   nameArabic: string;
   nameTransliterated: string;
-  nameFrench: string;
   ayahCount: number;
   revelationPlace: RevelationPlace;
 }

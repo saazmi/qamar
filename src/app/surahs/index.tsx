@@ -52,7 +52,7 @@ export default function SurahListScreen() {
                 </View>
                 <View style={styles.rowMain}>
                   <View style={styles.rowTopLine}>
-                    <Text style={styles.french}>{item.nameFrench}</Text>
+                    <Text style={styles.french}>{item.nameTransliterated}</Text>
                     <Text style={styles.count}>{item.ayahCount}</Text>
                   </View>
                   <View style={styles.rowMidLine}>

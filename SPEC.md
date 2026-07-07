@@ -362,12 +362,13 @@ qamar/
 SurahMeta {
   id: 1..114
   nameArabic: string          // "الفاتحة"
-  nameTransliterated: string  // "Al-Fatiha" (French-friendly transliteration)
-  nameFrench: string          // "L'Ouverture"
+  nameTransliterated: string  // "Al-Fatiha" — primary display name (owner note 2026-07-07)
   ayahCount: number
   revelationPlace: "makkah" | "madinah"
 }
 ```
+
+Naming convention (owner note 2026-07-07): the transliterated form (Al-Fatiha, Al-Baqara, Al-Imran) is the primary display name across all screens, not a French translation. Translated titles ("L'Ouverture", "La Vache") are intentionally not shipped.
 
 `ayah-index.json` — 6,236 records mapping `(surah, ayah)` → `{ juz: 1..30, hizbQuarter: 1..240, page: 1..604 }` (Madani page numbers used only for chunk sizing and juz aggregation, not for layout).
 
