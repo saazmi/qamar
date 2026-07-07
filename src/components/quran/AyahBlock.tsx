@@ -6,6 +6,7 @@ import { memo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useHifzStore } from '@stores/hifz';
 import { useNotesStore } from '@stores/notes';
+import { useSessionStore } from '@stores/session';
 import { light } from '@theme/colors';
 import type { AyahState } from '@core/hifz';
 
@@ -37,11 +38,15 @@ export const AyahBlock = memo(function AyahBlock({
   const hasNote = useNotesStore((s) =>
     s.notes.some((n) => n.scope === 'ayah' && n.surah === surah && n.ayah === ayah),
   );
+  const isPlaying = useSessionStore(
+    (s) => s.playingAyah?.surah === surah && s.playingAyah?.ayah === ayah,
+  );
 
   const style = [
     styles.block,
     state === 'learning' && styles.blockLearning,
     (state === 'memorized' || state === 'needsReview') && styles.blockMemorized,
+    isPlaying && styles.blockPlaying,
   ];
 
   return (
@@ -78,6 +83,9 @@ const styles = StyleSheet.create({
   },
   blockMemorized: {
     backgroundColor: light.state.memorizedBg,
+  },
+  blockPlaying: {
+    backgroundColor: light.state.playingBg,
   },
   surline: {
     position: 'absolute',

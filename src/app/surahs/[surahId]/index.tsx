@@ -3,10 +3,11 @@
 // Sticky mode toolbar drives all verse interactions via tap only.
 
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
-import { NotebookPen } from 'lucide-react-native';
+import { NotebookPen, Pause, Play } from 'lucide-react-native';
+import { ensureAudioConfigured, playRange, stopPlayback } from '@audio/player';
 import { AyahBlock } from '@components/quran/AyahBlock';
 import { ContinuousPage } from '@components/quran/ContinuousPage';
 import { NoteEditorSheet } from '@components/quran/NoteEditorSheet';
@@ -49,8 +50,40 @@ export default function ReadingViewScreen() {
   const rangeSelection = useSessionStore((s) => s.rangeSelection);
   const noteEditor = useSessionStore((s) => s.noteEditor);
   const openNoteEditor = useSessionStore((s) => s.openNoteEditor);
+  const setPlayingAyah = useSessionStore((s) => s.setPlayingAyah);
+  const playingAyah = useSessionStore((s) => s.playingAyah);
   const surahNoteCount = useNotesStore((s) =>
     s.notes.reduce((n, note) => (note.scope === 'surah' && note.surah === id ? n + 1 : n), 0),
+  );
+
+  const isPlayingSurah = playingAyah?.surah === id;
+  const playbackHandleRef = useRef<{ stop: () => Promise<void> } | null>(null);
+
+  const startPlayback = async () => {
+    await ensureAudioConfigured();
+    const startAyah = isPlayingSurah && playingAyah ? playingAyah.ayah : 1;
+    const handle = await playRange(
+      id,
+      startAyah,
+      surahMeta?.ayahCount ?? 1,
+      setPlayingAyah,
+    );
+    playbackHandleRef.current = handle;
+  };
+
+  const stopSurahPlayback = async () => {
+    await playbackHandleRef.current?.stop();
+    playbackHandleRef.current = null;
+    await stopPlayback();
+    setPlayingAyah(null);
+  };
+
+  useEffect(
+    () => () => {
+      void stopSurahPlayback();
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
   );
   const onTap = useAyahTapHandler();
 
@@ -100,6 +133,21 @@ export default function ReadingViewScreen() {
             {surahMeta.nameTransliterated} · {surahMeta.ayahCount} versets
           </Text>
         </View>
+        <Pressable
+          onPress={() => {
+            if (isPlayingSurah) void stopSurahPlayback();
+            else void startPlayback();
+          }}
+          hitSlop={12}
+          style={styles.playBtn}
+          accessibilityLabel="Lecture continue"
+        >
+          {isPlayingSurah ? (
+            <Pause size={18} color={light.state.playingMarker} />
+          ) : (
+            <Play size={18} color={light.textMuted} />
+          )}
+        </Pressable>
         <Pressable
           onPress={() => openNoteEditor(id)}
           hitSlop={12}
@@ -202,6 +250,9 @@ const styles = StyleSheet.create({
   toggleOn: {
     color: light.accent,
     borderColor: light.accent,
+  },
+  playBtn: {
+    paddingHorizontal: 4,
   },
   notesBtn: {
     position: 'relative',

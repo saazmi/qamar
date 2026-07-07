@@ -6,6 +6,7 @@ import { memo, useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { useHifzStore } from '@stores/hifz';
 import { useNotesStore } from '@stores/notes';
+import { useSessionStore } from '@stores/session';
 import { light } from '@theme/colors';
 import type { AyahState } from '@core/hifz';
 
@@ -31,13 +32,15 @@ function toArabicIndic(n: number): string {
     .join('');
 }
 
-function backgroundFor(state: AyahState): string | undefined {
+function backgroundFor(state: AyahState, playing: boolean): string | undefined {
+  if (playing) return light.state.playingBg;
   if (state === 'learning') return light.state.learningBg;
   if (state === 'memorized' || state === 'needsReview') return light.state.memorizedBg;
   return undefined;
 }
 
-function markerColorFor(state: AyahState): string {
+function markerColorFor(state: AyahState, playing: boolean): string {
+  if (playing) return light.state.playingMarker;
   if (state === 'memorized') return light.accent;
   if (state === 'needsReview') return light.state.needsReview;
   if (state === 'learning') return '#8B6914';
@@ -59,6 +62,7 @@ export const ContinuousPage = memo(function ContinuousPage({
 }: Props) {
   const records = useHifzStore((s) => s.records);
   const allNotes = useNotesStore((s) => s.notes);
+  const playingAyah = useSessionStore((s) => s.playingAyah);
 
   const stateBySeq = useMemo(() => {
     const map = new Map<number, AyahState>();
@@ -90,8 +94,9 @@ export const ContinuousPage = memo(function ContinuousPage({
       >
         {ayat.map((a) => {
           const state = stateBySeq.get(a.ayah) ?? 'none';
-          const bg = backgroundFor(state);
-          const markerColor = markerColorFor(state);
+          const playing = playingAyah?.surah === surah && playingAyah?.ayah === a.ayah;
+          const bg = backgroundFor(state, playing);
+          const markerColor = markerColorFor(state, playing);
           return (
             <Text
               key={a.ayah}

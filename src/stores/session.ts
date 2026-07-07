@@ -36,6 +36,10 @@ interface SessionState {
   noteEditor: { surah: number; ayah?: number } | null;
   openNoteEditor: (surah: number, ayah?: number) => void;
   closeNoteEditor: () => void;
+
+  // The verse currently being auto-played by continuous playback.
+  playingAyah: { surah: number; ayah: number } | null;
+  setPlayingAyah: (v: { surah: number; ayah: number } | null) => void;
 }
 
 export const useSessionStore = create<SessionState>((set) => ({
@@ -56,6 +60,6 @@ export const useSessionStore = create<SessionState>((set) => ({
   openNoteEditor: (surah, ayah) => set({ noteEditor: { surah, ayah } }),
   closeNoteEditor: () => set({ noteEditor: null }),
 
-  // NOTE: existing typing kept for now — openVerseSheet/openNoteEditor share
-  // (surah, ayah) but noteEditor tolerates undefined ayah for surah scope.
+  playingAyah: null,
+  setPlayingAyah: (v) => set({ playingAyah: v }),
 }));

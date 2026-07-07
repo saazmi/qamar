@@ -60,7 +60,50 @@ export async function playAyah(
 
 export async function stopPlayback(): Promise<void> {
   generation += 1;
+  sequenceGen += 1;
   await unloadCurrent();
+}
+
+let sequenceGen = 0;
+
+// Play a run of ayat back-to-back. Advances via onFinished callback of each
+// track. Returns immediately with a stop() handle; the caller receives per-
+// ayah progress via onAyahChange.
+export async function playRange(
+  surah: number,
+  fromAyah: number,
+  toAyah: number,
+  onAyahChange: (v: { surah: number; ayah: number } | null) => void,
+  opts: { rate?: number } = {},
+): Promise<{ stop: () => Promise<void> }> {
+  const gen = ++sequenceGen;
+
+  const playNext = async (ayah: number): Promise<void> => {
+    if (gen !== sequenceGen) return;
+    if (ayah > toAyah) {
+      if (gen === sequenceGen) onAyahChange(null);
+      return;
+    }
+    onAyahChange({ surah, ayah });
+    await playAyah(surah, ayah, {
+      rate: opts.rate,
+      onFinished: () => {
+        void playNext(ayah + 1);
+      },
+    });
+  };
+
+  await playNext(fromAyah);
+
+  return {
+    stop: async () => {
+      if (gen === sequenceGen) {
+        sequenceGen += 1;
+        onAyahChange(null);
+        await unloadCurrent();
+      }
+    },
+  };
 }
 
 // Configure the audio session once — background playback + silent-switch safe.

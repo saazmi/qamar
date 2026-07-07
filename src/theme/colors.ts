@@ -12,6 +12,8 @@ export const light = {
     memorizedBg: '#DCEBE1',
     memorizedLine: '#2D6A4F',
     needsReview: '#8FB39D',
+    playingBg: '#D6DEEF',
+    playingMarker: '#4C6FA5',
   },
   error: '#B03A48',
   // v1.1 — SPEC §8.3
@@ -30,6 +32,8 @@ export const dark = {
     memorizedBg: '#22362C',
     memorizedLine: '#5FA383',
     needsReview: '#4E7A63',
+    playingBg: '#2A3245',
+    playingMarker: '#7B99C9',
   },
   error: '#D77687',
   tajweed: {},
