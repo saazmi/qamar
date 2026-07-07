@@ -1,9 +1,11 @@
 // Continuous mushaf paragraph. SPEC §11.1 (revised 2026-07-07).
 // One <Text> per Madani page; ayat are nested <Text> spans with their own
-// onPress/onLongPress. Background wash + colored ayah marker convey state
-// (no top border — inline spans can't render borders in RN).
+// press handlers. Background wash + colored ayah marker convey state.
+//
+// RN Web note: nested Text `onLongPress` is unreliable, so we implement
+// long-press via onPressIn / onPressOut / onPress timing per-span.
 
-import { memo, useCallback } from 'react';
+import { memo, useCallback, useMemo, useRef } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { useHifzStore } from '@stores/hifz';
 import { useUiStore } from '@stores/ui';
@@ -29,6 +31,8 @@ const CYCLE: Record<'none' | 'learning' | 'memorized', 'learning' | 'memorized' 
   memorized: 'none',
 };
 
+const LONG_PRESS_MS = 380;
+
 const ARABIC_INDIC = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'] as const;
 
 function toArabicIndic(n: number): string {
@@ -51,6 +55,74 @@ function markerColorFor(state: AyahState): string {
   return light.textMuted;
 }
 
+interface SpanProps {
+  surah: number;
+  ayah: number;
+  text: string;
+  state: AyahState;
+  onTap: (ayah: number) => void;
+  onCycle: (ayah: number) => void;
+}
+
+const AyahSpan = memo(function AyahSpan({
+  surah: _surah,
+  ayah,
+  text,
+  state,
+  onTap,
+  onCycle,
+}: SpanProps) {
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const longFiredRef = useRef(false);
+
+  const cancelTimer = useCallback(() => {
+    if (timerRef.current !== null) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+  }, []);
+
+  const onPressIn = useCallback(() => {
+    longFiredRef.current = false;
+    cancelTimer();
+    timerRef.current = setTimeout(() => {
+      longFiredRef.current = true;
+      onCycle(ayah);
+      timerRef.current = null;
+    }, LONG_PRESS_MS);
+  }, [ayah, onCycle, cancelTimer]);
+
+  const onPressOut = useCallback(() => {
+    cancelTimer();
+  }, [cancelTimer]);
+
+  const onPress = useCallback(() => {
+    if (longFiredRef.current) {
+      longFiredRef.current = false;
+      return;
+    }
+    onTap(ayah);
+  }, [ayah, onTap]);
+
+  const bg = backgroundFor(state);
+  const markerColor = markerColorFor(state);
+
+  return (
+    <Text
+      onPress={onPress}
+      onPressIn={onPressIn}
+      onPressOut={onPressOut}
+      style={bg ? { backgroundColor: bg } : undefined}
+    >
+      {text}
+      <Text style={[styles.marker, { color: markerColor }]}>
+        {' '}
+        ۝{toArabicIndic(ayah)}{' '}
+      </Text>
+    </Text>
+  );
+});
+
 export const ContinuousPage = memo(function ContinuousPage({
   surah,
   page,
@@ -63,17 +135,25 @@ export const ContinuousPage = memo(function ContinuousPage({
   const undo = useHifzStore((s) => s.undo);
   const showToast = useUiStore((s) => s.showToast);
 
-  const stateOf = useCallback(
-    (ayah: number): AyahState => {
-      const r = records.find((rr) => rr.surah === surah && rr.ayah === ayah);
-      return r?.state ?? 'none';
+  const stateBySeq = useMemo(() => {
+    const map = new Map<number, AyahState>();
+    for (const a of ayat) {
+      const r = records.find((rr) => rr.surah === surah && rr.ayah === a.ayah);
+      map.set(a.ayah, r?.state ?? 'none');
+    }
+    return map;
+  }, [records, surah, ayat]);
+
+  const onTap = useCallback(
+    (ayah: number) => {
+      onOpenSheet?.(surah, ayah);
     },
-    [records, surah],
+    [onOpenSheet, surah],
   );
 
-  const handleLongPress = useCallback(
+  const onCycle = useCallback(
     (ayah: number) => {
-      const s = stateOf(ayah);
+      const s = stateBySeq.get(ayah) ?? 'none';
       const current = s === 'needsReview' ? 'memorized' : s;
       const next = CYCLE[current as 'none' | 'learning' | 'memorized'];
       setState(surah, ayah, next);
@@ -84,7 +164,7 @@ export const ContinuousPage = memo(function ContinuousPage({
         onAction: () => undo(),
       });
     },
-    [stateOf, setState, showToast, undo, surah],
+    [stateBySeq, setState, showToast, undo, surah],
   );
 
   return (
@@ -98,25 +178,17 @@ export const ContinuousPage = memo(function ContinuousPage({
           { fontSize, lineHeight: Math.round(fontSize * 1.95) },
         ]}
       >
-        {ayat.map((a) => {
-          const state = stateOf(a.ayah);
-          const bg = backgroundFor(state);
-          const markerColor = markerColorFor(state);
-          return (
-            <Text
-              key={a.ayah}
-              onPress={() => onOpenSheet?.(surah, a.ayah)}
-              onLongPress={() => handleLongPress(a.ayah)}
-              style={bg ? { backgroundColor: bg } : undefined}
-            >
-              {a.text}
-              <Text style={[styles.marker, { color: markerColor }]}>
-                {' '}
-                ۝{toArabicIndic(a.ayah)}{' '}
-              </Text>
-            </Text>
-          );
-        })}
+        {ayat.map((a) => (
+          <AyahSpan
+            key={a.ayah}
+            surah={surah}
+            ayah={a.ayah}
+            text={a.text}
+            state={stateBySeq.get(a.ayah) ?? 'none'}
+            onTap={onTap}
+            onCycle={onCycle}
+          />
+        ))}
       </Text>
     </View>
   );
