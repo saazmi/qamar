@@ -99,7 +99,8 @@ export async function playRange(
     stop: async () => {
       if (gen === sequenceGen) {
         sequenceGen += 1;
-        onAyahChange(null);
+        // Deliberately do NOT call onAyahChange(null) here — callers rely on
+        // the last-played ayah remaining set to support pause/resume.
         await unloadCurrent();
       }
     },

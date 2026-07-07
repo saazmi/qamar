@@ -71,16 +71,20 @@ export default function ReadingViewScreen() {
     playbackHandleRef.current = handle;
   };
 
+  // Pause: keep session.playingAyah set so the highlight remains and the
+  // next play resumes from there. Only natural end-of-surah clears it (via
+  // playRange's onAyahChange).
   const stopSurahPlayback = async () => {
     await playbackHandleRef.current?.stop();
     playbackHandleRef.current = null;
     await stopPlayback();
-    setPlayingAyah(null);
   };
 
   useEffect(
     () => () => {
+      // Unmount: clear highlight AND stop audio.
       void stopSurahPlayback();
+      setPlayingAyah(null);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
