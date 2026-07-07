@@ -195,7 +195,7 @@ export default function ReadingViewScreen() {
           keyExtractor={(item) => `p${item.page}`}
           contentContainerStyle={{ padding: 20, paddingBottom: 96 }}
           renderItem={({ item }) => (
-            <ContinuousPage surah={id} page={item.page} ayat={item.ayat} onTap={onTap} />
+            <ContinuousPage surah={id} ayat={item.ayat} onTap={onTap} />
           )}
         />
       )}
