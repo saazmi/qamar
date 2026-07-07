@@ -2,6 +2,7 @@
 // Behavior depends on the current readingMode (session store).
 
 import { useCallback } from 'react';
+import { ensureAudioConfigured, playAyah } from '@audio/player';
 import { useHifzStore } from '@stores/hifz';
 import { useSessionStore } from '@stores/session';
 import { useUiStore } from '@stores/ui';
@@ -59,7 +60,10 @@ export function useAyahTapHandler() {
       }
 
       if (mode === 'listen') {
-        showToast({ message: 'Audio — bientôt disponible' });
+        void (async () => {
+          await ensureAudioConfigured();
+          await playAyah(surah, ayah);
+        })();
         return;
       }
 

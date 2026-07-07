@@ -15,6 +15,7 @@ import {
 } from 'react-native';
 import { Eye, EyeOff } from 'lucide-react-native';
 import { CanvasView } from '@components/notes/Canvas';
+import { useAyahAudio } from '../../hooks/useAyahAudio';
 import { useHifzStore } from '@stores/hifz';
 import { useNotesStore } from '@stores/notes';
 import { useSessionStore } from '@stores/session';
@@ -51,6 +52,7 @@ export function VerseSheet() {
   const openVerse = useSessionStore((s) => s.openVerse);
   const close = useSessionStore((s) => s.closeVerseSheet);
   const [viewingId, setViewingId] = useState<string | null>(null);
+  const { play, stop, loading, isPlaying } = useAyahAudio();
   const records = useHifzStore((s) => s.records);
   const setState = useHifzStore((s) => s.setState);
   const applyRange = useHifzStore((s) => s.applyRange);
@@ -170,10 +172,26 @@ export function VerseSheet() {
 
             <Pressable
               style={styles.audioBtn}
-              onPress={() => showToast({ message: 'Audio — bientôt disponible' })}
+              onPress={() => {
+                if (!openVerse) return;
+                if (isPlaying(openVerse.surah, openVerse.ayah)) {
+                  void stop();
+                } else {
+                  void play(openVerse.surah, openVerse.ayah);
+                }
+              }}
+              disabled={loading}
             >
-              <Text style={styles.audioGlyph}>▶</Text>
-              <Text style={styles.audioLabel}>Écouter</Text>
+              <Text style={styles.audioGlyph}>
+                {isPlaying(openVerse.surah, openVerse.ayah) ? '■' : '▶'}
+              </Text>
+              <Text style={styles.audioLabel}>
+                {loading
+                  ? 'Chargement…'
+                  : isPlaying(openVerse.surah, openVerse.ayah)
+                  ? 'Arrêter'
+                  : 'Écouter'}
+              </Text>
             </Pressable>
 
             {frenchText ? (

@@ -1,2 +1,80 @@
-// Playback + loop logic. SPEC §12.5.
-// Per-ayah, repeat ×3/×5/∞, range play, speed 0.75/1.0/1.25, background audio.
+// Playback engine. SPEC §12.5. Single active Sound at a time — call playAyah()
+// to preempt anything already playing. Repeat/range/speed are follow-up work.
+
+import { Audio, type AVPlaybackStatus } from 'expo-av';
+import { resolveAudioUri } from './cache';
+
+let current: Audio.Sound | null = null;
+let generation = 0;
+
+async function unloadCurrent(): Promise<void> {
+  if (!current) return;
+  try {
+    await current.unloadAsync();
+  } catch {
+    // ignore
+  }
+  current = null;
+}
+
+export interface PlayHandle {
+  stop: () => Promise<void>;
+}
+
+export async function playAyah(
+  surah: number,
+  ayah: number,
+  opts: { rate?: number; onFinished?: () => void } = {},
+): Promise<PlayHandle> {
+  const gen = ++generation;
+  await unloadCurrent();
+  if (gen !== generation) return { stop: async () => {} };
+
+  const uri = await resolveAudioUri(surah, ayah);
+  if (gen !== generation) return { stop: async () => {} };
+
+  const { sound } = await Audio.Sound.createAsync(
+    { uri },
+    { shouldPlay: true, rate: opts.rate ?? 1, shouldCorrectPitch: true },
+    (status: AVPlaybackStatus) => {
+      if (!status.isLoaded) return;
+      if (status.didJustFinish) {
+        opts.onFinished?.();
+        void unloadCurrent();
+      }
+    },
+  );
+
+  if (gen !== generation) {
+    void sound.unloadAsync();
+    return { stop: async () => {} };
+  }
+
+  current = sound;
+  return {
+    stop: async () => {
+      if (current === sound) await unloadCurrent();
+    },
+  };
+}
+
+export async function stopPlayback(): Promise<void> {
+  generation += 1;
+  await unloadCurrent();
+}
+
+// Configure the audio session once — background playback + silent-switch safe.
+let configured = false;
+export async function ensureAudioConfigured(): Promise<void> {
+  if (configured) return;
+  configured = true;
+  try {
+    await Audio.setAudioModeAsync({
+      playsInSilentModeIOS: true,
+      staysActiveInBackground: true,
+      shouldDuckAndroid: true,
+    });
+  } catch {
+    // ignore — audio can still play, just with default session behavior
+  }
+}
