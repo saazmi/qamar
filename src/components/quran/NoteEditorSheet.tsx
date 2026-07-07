@@ -13,6 +13,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { Eye, EyeOff } from 'lucide-react-native';
 import { Canvas, CanvasView, parseStrokes, type CanvasHandle } from '@components/notes/Canvas';
 import structure from '@content/structure.json';
 import { loadSurah } from '@content/text';
@@ -30,7 +31,6 @@ const STORAGE_WARN_BYTES = 4 * 1024 * 1024; // ~4 MB — approaching Android Asy
 export function NoteEditorSheet() {
   const target = useSessionStore((s) => s.noteEditor);
   const close = useSessionStore((s) => s.closeNoteEditor);
-  const openNoteViewer = useSessionStore((s) => s.openNoteViewer);
   const allNotes = useNotesStore((s) => s.notes);
   const addNote = useNotesStore((s) => s.addNote);
   const updateNote = useNotesStore((s) => s.updateNote);
@@ -45,6 +45,7 @@ export function NoteEditorSheet() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingBody, setEditingBody] = useState('');
   const editCanvasRef = useRef<CanvasHandle | null>(null);
+  const [viewingId, setViewingId] = useState<string | null>(null);
 
   const meta = target ? META.find((m) => m.id === target.surah) : undefined;
   const arabicText = useMemo(() => {
@@ -205,19 +206,43 @@ export function NoteEditorSheet() {
                       )
                     ) : (
                       <>
-                        {n.kind === 'text' ? (
-                          <Text style={styles.noteBody}>{n.body}</Text>
-                        ) : (
-                          <View style={styles.canvasViewWrap}>
-                            <CanvasView body={n.body} />
-                          </View>
-                        )}
+                        {(() => {
+                          const expanded = viewingId === n.id;
+                          if (n.kind === 'text') {
+                            return (
+                              <Text
+                                style={styles.noteBody}
+                                numberOfLines={expanded ? undefined : 2}
+                              >
+                                {n.body}
+                              </Text>
+                            );
+                          }
+                          return expanded ? (
+                            <View style={styles.canvasFullWrap}>
+                              <CanvasView body={n.body} />
+                            </View>
+                          ) : (
+                            <View style={styles.canvasThumbWrap}>
+                              <CanvasView body={n.body} width={110} />
+                            </View>
+                          );
+                        })()}
                         <View style={styles.actionsRow}>
                           <Pressable onPress={() => handleDelete(n)} hitSlop={8}>
                             <Text style={styles.actionMuted}>Supprimer</Text>
                           </Pressable>
-                          <Pressable onPress={() => openNoteViewer(n.id)} hitSlop={8}>
-                            <Text style={styles.actionMuted}>Voir</Text>
+                          <Pressable
+                            onPress={() =>
+                              setViewingId(viewingId === n.id ? null : n.id)
+                            }
+                            hitSlop={8}
+                          >
+                            {viewingId === n.id ? (
+                              <EyeOff size={18} color={light.textMuted} />
+                            ) : (
+                              <Eye size={18} color={light.textMuted} />
+                            )}
                           </Pressable>
                           <Pressable onPress={() => startEdit(n)} hitSlop={8}>
                             <Text style={styles.action}>Modifier</Text>
@@ -376,7 +401,13 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     color: light.text,
   },
-  canvasViewWrap: {
+  canvasThumbWrap: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 6,
+    padding: 4,
+    alignSelf: 'flex-start',
+  },
+  canvasFullWrap: {
     backgroundColor: '#FFFFFF',
     borderRadius: 8,
     padding: 8,

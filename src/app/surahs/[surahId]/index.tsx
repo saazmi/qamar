@@ -6,7 +6,6 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
-import { NoteViewer } from '@components/notes/NoteViewer';
 import { AyahBlock } from '@components/quran/AyahBlock';
 import { ContinuousPage } from '@components/quran/ContinuousPage';
 import { NoteEditorSheet } from '@components/quran/NoteEditorSheet';
@@ -47,7 +46,6 @@ export default function ReadingViewScreen() {
   const openVerse = useSessionStore((s) => s.openVerse);
   const rangeSelection = useSessionStore((s) => s.rangeSelection);
   const noteEditor = useSessionStore((s) => s.noteEditor);
-  const viewingNoteId = useSessionStore((s) => s.viewingNoteId);
   const onTap = useAyahTapHandler();
 
   const ayat = useMemo(() => loadSurah(id) ?? [], [id]);
@@ -132,7 +130,6 @@ export default function ReadingViewScreen() {
       {openVerse && <VerseSheet />}
       {rangeSelection && <RangeStateSheet />}
       {noteEditor && <NoteEditorSheet />}
-      {viewingNoteId && <NoteViewer />}
     </View>
   );
 }

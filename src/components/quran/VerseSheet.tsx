@@ -4,7 +4,7 @@
 // - translation (always shown in the sheet, per §11.4)
 // - "Marquer jusqu'ici…" range shortcut back to the start of the current run
 
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   Modal,
   Pressable,
@@ -13,6 +13,7 @@ import {
   Text,
   View,
 } from 'react-native';
+import { Eye, EyeOff } from 'lucide-react-native';
 import { CanvasView } from '@components/notes/Canvas';
 import { useHifzStore } from '@stores/hifz';
 import { useNotesStore } from '@stores/notes';
@@ -49,7 +50,7 @@ function findRunStart(records: ReturnType<typeof useHifzStore.getState>['records
 export function VerseSheet() {
   const openVerse = useSessionStore((s) => s.openVerse);
   const close = useSessionStore((s) => s.closeVerseSheet);
-  const openNoteViewer = useSessionStore((s) => s.openNoteViewer);
+  const [viewingId, setViewingId] = useState<string | null>(null);
   const records = useHifzStore((s) => s.records);
   const setState = useHifzStore((s) => s.setState);
   const applyRange = useHifzStore((s) => s.applyRange);
@@ -190,27 +191,42 @@ export function VerseSheet() {
                 <>
                   {[...verseNotes, ...surahNotes].map((n) => {
                     const scopeLabel = n.scope === 'ayah' ? 'Verset' : 'Sourate';
+                    const expanded = viewingId === n.id;
                     return (
                       <View key={n.id} style={styles.noteCard}>
-                        <Text style={styles.noteScope}>
-                          {scopeLabel} · {n.kind === 'canvas' ? 'dessin' : 'texte'}
-                        </Text>
+                        <View style={styles.noteHeaderRow}>
+                          <Text style={styles.noteScope}>
+                            {scopeLabel} · {n.kind === 'canvas' ? 'dessin' : 'texte'}
+                          </Text>
+                          <Pressable
+                            onPress={() => setViewingId(expanded ? null : n.id)}
+                            hitSlop={8}
+                          >
+                            {expanded ? (
+                              <EyeOff size={16} color={light.textMuted} />
+                            ) : (
+                              <Eye size={16} color={light.textMuted} />
+                            )}
+                          </Pressable>
+                        </View>
                         {n.kind === 'canvas' ? (
-                          <View style={styles.canvasWrap}>
-                            <CanvasView body={n.body} width={280} />
-                          </View>
+                          expanded ? (
+                            <View style={styles.canvasFullWrap}>
+                              <CanvasView body={n.body} />
+                            </View>
+                          ) : (
+                            <View style={styles.canvasThumb}>
+                              <CanvasView body={n.body} width={90} />
+                            </View>
+                          )
                         ) : (
-                          <Text style={styles.noteBody} numberOfLines={4}>
+                          <Text
+                            style={styles.noteBody}
+                            numberOfLines={expanded ? undefined : 2}
+                          >
                             {n.body}
                           </Text>
                         )}
-                        <Pressable
-                          onPress={() => openNoteViewer(n.id)}
-                          style={styles.viewBtn}
-                          hitSlop={8}
-                        >
-                          <Text style={styles.viewLabel}>Voir en grand</Text>
-                        </Pressable>
                       </View>
                     );
                   })}
@@ -393,17 +409,19 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     color: light.text,
   },
-  canvasWrap: {
-    alignItems: 'center',
+  canvasThumb: {
+    alignSelf: 'flex-start',
     marginTop: 4,
   },
-  viewBtn: {
-    marginTop: 8,
-    alignSelf: 'flex-end',
+  canvasFullWrap: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 8,
+    padding: 8,
+    marginTop: 4,
   },
-  viewLabel: {
-    fontFamily: 'Inter_600SemiBold',
-    fontSize: 12,
-    color: light.accent,
+  noteHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
 });

@@ -35,10 +35,6 @@ interface SessionState {
   noteEditor: OpenVerse | null;
   openNoteEditor: (surah: number, ayah: number) => void;
   closeNoteEditor: () => void;
-
-  viewingNoteId: string | null;
-  openNoteViewer: (id: string) => void;
-  closeNoteViewer: () => void;
 }
 
 export const useSessionStore = create<SessionState>((set) => ({
@@ -58,8 +54,4 @@ export const useSessionStore = create<SessionState>((set) => ({
   noteEditor: null,
   openNoteEditor: (surah, ayah) => set({ noteEditor: { surah, ayah } }),
   closeNoteEditor: () => set({ noteEditor: null }),
-
-  viewingNoteId: null,
-  openNoteViewer: (id) => set({ viewingNoteId: id }),
-  closeNoteViewer: () => set({ viewingNoteId: null }),
 }));
