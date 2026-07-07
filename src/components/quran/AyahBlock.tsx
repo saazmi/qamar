@@ -54,9 +54,10 @@ export const AyahBlock = memo(function AyahBlock({
           </View>
         )}
         <Text style={[styles.arabic, { fontSize, lineHeight: Math.round(fontSize * 1.85) }]}>
-          {text} <Text style={styles.marker}>﴿{ayah}﴾</Text>
+          {text}{' '}
+          {hasNote && <Text style={styles.noteGlyph}>✎ </Text>}
+          <Text style={styles.marker}>﴿{ayah}﴾</Text>
         </Text>
-        {hasNote && <Text style={styles.noteGlyph}>✎</Text>}
       </View>
       {showFrench && frenchText ? <Text style={styles.french}>{frenchText}</Text> : null}
     </Pressable>
@@ -125,8 +126,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   noteGlyph: {
-    fontSize: 14,
+    fontSize: 16,
     color: light.accentSecondary,
-    marginTop: 4,
   },
 });

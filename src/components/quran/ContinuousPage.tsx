@@ -102,10 +102,10 @@ export const ContinuousPage = memo(function ContinuousPage({
               {a.text}
               <Text style={[styles.marker, { color: markerColor }]}>
                 {' '}
-                ۝{toArabicIndic(a.ayah)}
                 {noteSet.has(a.ayah) ? (
-                  <Text style={styles.noteGlyph}> ✎</Text>
+                  <Text style={styles.noteGlyph}>✎ </Text>
                 ) : null}
+                ۝{toArabicIndic(a.ayah)}
                 {' '}
               </Text>
             </Text>
