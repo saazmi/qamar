@@ -1,8 +1,9 @@
 // Semantic color tokens. SPEC §16.2. No raw hex in components — reference tokens only.
 
 export const light = {
-  bg: '#FAF7F2',
-  surface: '#FFFFFF',
+  bg: '#F5EAC7', // light parchment gold — mushaf feel (from the secondary accent family)
+  surface: '#FFFDF6', // near-white with a warm cast so cards still pop against the gold bg
+
   text: '#1F1B16',
   textMuted: '#6B6357',
   accent: '#2D6A4F', // memorized / primary

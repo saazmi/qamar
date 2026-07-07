@@ -19,7 +19,7 @@
     "android": {
       "package": "app.qamar.hifz",
       "adaptiveIcon": {
-        "backgroundColor": "#FAF7F2"
+        "backgroundColor": "#F5EAC7"
       }
     },
     "plugins": [
