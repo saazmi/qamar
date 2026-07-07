@@ -1,0 +1,277 @@
+// Verse bottom sheet. SPEC §11.4.
+// - surah:ayah reference + Arabic text
+// - three-button state segmented control (Non commencé / En cours / Mémorisé)
+// - translation (always shown in the sheet, per §11.4)
+// - "Marquer jusqu'ici…" range shortcut back to the start of the current run
+
+import { useEffect, useMemo } from 'react';
+import {
+  Modal,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
+import { useHifzStore } from '@stores/hifz';
+import { useSessionStore } from '@stores/session';
+import { useUiStore } from '@stores/ui';
+import structure from '@content/structure.json';
+import { loadSurah } from '@content/text';
+import { loadSurah as loadFrench } from '@content/translation-fr';
+import type { AyahText, SurahMeta } from '@content/types';
+import type { AyahState } from '@core/hifz';
+import { light } from '@theme/colors';
+
+const META = structure as SurahMeta[];
+
+const STATES: Array<{ key: 'none' | 'learning' | 'memorized'; label: string }> = [
+  { key: 'none', label: 'Non commencé' },
+  { key: 'learning', label: 'En cours' },
+  { key: 'memorized', label: 'Mémorisé' },
+];
+
+function stateOf(records: ReturnType<typeof useHifzStore.getState>['records'], surah: number, ayah: number): AyahState {
+  const r = records.find((rr) => rr.surah === surah && rr.ayah === ayah);
+  return r?.state ?? 'none';
+}
+
+function findRunStart(records: ReturnType<typeof useHifzStore.getState>['records'], surah: number, ayah: number): number {
+  const s = stateOf(records, surah, ayah);
+  if (s === 'none') return ayah;
+  let start = ayah;
+  while (start > 1 && stateOf(records, surah, start - 1) === s) start -= 1;
+  return start;
+}
+
+export function VerseSheet() {
+  const openVerse = useSessionStore((s) => s.openVerse);
+  const close = useSessionStore((s) => s.closeVerseSheet);
+  const records = useHifzStore((s) => s.records);
+  const setState = useHifzStore((s) => s.setState);
+  const applyRange = useHifzStore((s) => s.applyRange);
+  const undo = useHifzStore((s) => s.undo);
+  const showToast = useUiStore((s) => s.showToast);
+
+  const meta = openVerse ? META.find((m) => m.id === openVerse.surah) : undefined;
+
+  const arabicText = useMemo(() => {
+    if (!openVerse) return '';
+    const list = loadSurah(openVerse.surah) ?? [];
+    return list.find((a: AyahText) => a.ayah === openVerse.ayah)?.text ?? '';
+  }, [openVerse]);
+
+  const frenchText = useMemo(() => {
+    if (!openVerse) return '';
+    const list = loadFrench(openVerse.surah) ?? [];
+    return list.find((a: AyahText) => a.ayah === openVerse.ayah)?.text ?? '';
+  }, [openVerse]);
+
+  const currentState = openVerse ? stateOf(records, openVerse.surah, openVerse.ayah) : 'none';
+
+  // Reset store openVerse when component unmounts, defensive.
+  useEffect(() => () => close(), [close]);
+
+  if (!openVerse || !meta) return null;
+
+  const runStart = findRunStart(records, openVerse.surah, openVerse.ayah);
+  const canMarkRange = runStart !== openVerse.ayah;
+
+  const applyState = (next: 'none' | 'learning' | 'memorized') => {
+    setState(openVerse.surah, openVerse.ayah, next);
+    const label = { none: 'Effacé', learning: 'En cours', memorized: 'Mémorisé' }[next];
+    showToast({
+      message: `${label} · ${openVerse.surah}:${openVerse.ayah}`,
+      actionLabel: 'Annuler',
+      onAction: () => undo(),
+    });
+  };
+
+  const markRange = () => {
+    const s = stateOf(records, openVerse.surah, openVerse.ayah);
+    const target: 'none' | 'learning' | 'memorized' =
+      s === 'needsReview' ? 'memorized' : (s as 'none' | 'learning' | 'memorized');
+    applyRange(openVerse.surah, runStart, openVerse.ayah, target);
+    showToast({
+      message: `${runStart}–${openVerse.ayah} marqués`,
+      actionLabel: 'Annuler',
+      onAction: () => undo(),
+    });
+    close();
+  };
+
+  return (
+    <Modal
+      visible
+      transparent
+      animationType="slide"
+      onRequestClose={close}
+      statusBarTranslucent
+    >
+      <Pressable style={styles.scrim} onPress={close}>
+        <Pressable style={styles.sheet} onPress={(e) => e.stopPropagation?.()}>
+          <ScrollView contentContainerStyle={{ padding: 20 }} showsVerticalScrollIndicator={false}>
+            <View style={styles.grabber} />
+
+            <View style={styles.headerRow}>
+              <Text style={styles.ref}>
+                {meta.nameTransliterated} · {openVerse.surah}:{openVerse.ayah}
+              </Text>
+              <Pressable onPress={close} hitSlop={12}>
+                <Text style={styles.close}>×</Text>
+              </Pressable>
+            </View>
+
+            <Text style={styles.arabic} selectable>
+              {arabicText}
+            </Text>
+
+            <View style={styles.stateRow}>
+              {STATES.map((s) => {
+                const active = currentState === s.key || (currentState === 'needsReview' && s.key === 'memorized');
+                return (
+                  <Pressable
+                    key={s.key}
+                    onPress={() => applyState(s.key)}
+                    style={[styles.stateBtn, active && styles.stateBtnActive]}
+                  >
+                    <Text style={[styles.stateLabel, active && styles.stateLabelActive]}>
+                      {s.label}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+
+            {canMarkRange && (
+              <Pressable style={styles.rangeBtn} onPress={markRange}>
+                <Text style={styles.rangeLabel}>
+                  Marquer jusqu'ici · {runStart}–{openVerse.ayah}
+                </Text>
+              </Pressable>
+            )}
+
+            {frenchText ? (
+              <View style={styles.translationCard}>
+                <Text style={styles.translationLabel}>Traduction · Hamidullah</Text>
+                <Text style={styles.translation}>{frenchText}</Text>
+              </View>
+            ) : null}
+          </ScrollView>
+        </Pressable>
+      </Pressable>
+    </Modal>
+  );
+}
+
+const styles = StyleSheet.create({
+  scrim: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'flex-end',
+  },
+  sheet: {
+    backgroundColor: light.surface,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    maxHeight: '85%',
+  },
+  grabber: {
+    width: 36,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: '#DED7CB',
+    alignSelf: 'center',
+    marginBottom: 12,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  ref: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 14,
+    color: light.textMuted,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  close: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 26,
+    color: light.textMuted,
+    marginTop: -4,
+  },
+  arabic: {
+    fontFamily: 'NotoNaskhArabic_400Regular',
+    fontSize: 26,
+    lineHeight: 48,
+    color: light.text,
+    textAlign: 'right',
+    writingDirection: 'rtl',
+    marginBottom: 20,
+  },
+  stateRow: {
+    flexDirection: 'row',
+    borderRadius: 10,
+    backgroundColor: '#F5EFE4',
+    padding: 4,
+    gap: 4,
+  },
+  stateBtn: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  stateBtnActive: {
+    backgroundColor: light.surface,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  stateLabel: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 13,
+    color: light.textMuted,
+  },
+  stateLabelActive: {
+    color: light.accent,
+  },
+  rangeBtn: {
+    marginTop: 12,
+    paddingVertical: 12,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: light.accent,
+    alignItems: 'center',
+  },
+  rangeLabel: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 14,
+    color: light.accent,
+  },
+  translationCard: {
+    marginTop: 20,
+    padding: 16,
+    borderRadius: 10,
+    backgroundColor: '#F5EFE4',
+  },
+  translationLabel: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 11,
+    color: light.textMuted,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: 6,
+  },
+  translation: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 15,
+    lineHeight: 22,
+    color: light.text,
+  },
+});

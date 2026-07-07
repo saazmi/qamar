@@ -7,6 +7,8 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { AyahBlock } from '@components/quran/AyahBlock';
 import { ContinuousPage } from '@components/quran/ContinuousPage';
+import { VerseSheet } from '@components/quran/VerseSheet';
+import { useSessionStore } from '@stores/session';
 import structure from '@content/structure.json';
 import ayahIndexJson from '@content/ayah-index.json';
 import { loadSurah } from '@content/text';
@@ -38,6 +40,8 @@ export default function ReadingViewScreen() {
   const surahMeta = meta.find((m) => m.id === id);
 
   const [showFrench, setShowFrench] = useState(false);
+  const openVerseSheet = useSessionStore((s) => s.openVerseSheet);
+  const openVerse = useSessionStore((s) => s.openVerse);
 
   const ayat = useMemo(() => loadSurah(id) ?? [], [id]);
   const french = useMemo(() => loadFrench(id) ?? [], [id]);
@@ -103,6 +107,7 @@ export default function ReadingViewScreen() {
               text={item.text}
               frenchText={item.french}
               showFrench
+              onOpenSheet={openVerseSheet}
             />
           )}
         />
@@ -112,10 +117,16 @@ export default function ReadingViewScreen() {
           keyExtractor={(item) => `p${item.page}`}
           contentContainerStyle={{ padding: 20, paddingBottom: 96 }}
           renderItem={({ item }) => (
-            <ContinuousPage surah={id} page={item.page} ayat={item.ayat} />
+            <ContinuousPage
+              surah={id}
+              page={item.page}
+              ayat={item.ayat}
+              onOpenSheet={openVerseSheet}
+            />
           )}
         />
       )}
+      {openVerse && <VerseSheet />}
     </View>
   );
 }
